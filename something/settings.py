@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 #############################################
 
+from re import T
 from dotenv import load_dotenv
 load_dotenv()
 import os
@@ -42,6 +43,11 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
+# https://pypi.org/project/django-cors-headers/2.5.0/
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = (
+#     'http://localhost:3000',
+# )
 
 # Application definition
 
@@ -105,6 +111,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'something.wsgi.application'
 

@@ -8,7 +8,8 @@ from .models import *
 
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class Profile_Serializer(serializers.ModelSerializer):
 	profile_picture = VersatileImageFieldSerializer(
