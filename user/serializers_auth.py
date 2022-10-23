@@ -1,17 +1,23 @@
 
 
+from asyncio.windows_events import NULL
 from rest_framework import serializers
 
 from .models import *
 
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class Login_Serializer(serializers.Serializer):
 	username = serializers.CharField(max_length=300,required=True)
 	password = serializers.CharField(required=True,write_only=True)
 
+
+
 class Register_Serializer(serializers.ModelSerializer):
 	password = serializers.CharField(write_only=True,required=True,style={"input_type":"password"})
 	password2 = serializers.CharField(write_only=True,style={"input_type":"password"},label="Confirm password")
+	email = serializers.EmailField(required=True)
 	class Meta:
 		model = User
 		fields = [

@@ -31,10 +31,10 @@ class Register(generics.GenericAPIView):
 
 	def post(self,request, *args, **kwargs):
 		serializer =self.get_serializer(data=request.data)
-		if not serializer.is_valid():
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-		user = serializer.save()
-		return Response("Account registered successfully!",status.HTTP_201_CREATED)
+		if serializer.is_valid():
+			user = serializer.save()
+			return Response("Account registered successfully!",status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 from .serializers_auth import Login_Serializer
 class Login(generics.GenericAPIView):
@@ -49,8 +49,6 @@ class Login(generics.GenericAPIView):
 		if serializer.is_valid(raise_exception=True):
 			username=serializer.validated_data['username']
 			password=serializer.validated_data['password']
-			if username is None or password is None:
-				return Response({'error':'Should provide username and password'}, status=status.HTTP_400_BAD_REQUEST)
 			user = authenticate(username=username,password=password)
 			if not user:
 				return Response({'error':'invalid credentials'},status=status.HTTP_404_NOT_FOUND)
@@ -65,6 +63,8 @@ class Login(generics.GenericAPIView):
 			}
 
 			return Response(data,status=status.HTTP_201_CREATED)
+		else:
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 from .serializers_auth import ChangePassword_Serializer
