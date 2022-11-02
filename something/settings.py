@@ -82,6 +82,16 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=3),
+}
+
 MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",   #whitenoise
     'corsheaders.middleware.CorsMiddleware',    #corsheaders
