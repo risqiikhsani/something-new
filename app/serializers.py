@@ -9,7 +9,7 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 from user.serializers import User_Serializer
 
 class PostList_Serializer(serializers.ModelSerializer):
-	user = User_Serializer()
+	user = User_Serializer(required=False)
 	class Meta:
 		model = Post
 		fields = '__all__'

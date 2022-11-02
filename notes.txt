@@ -1,0 +1,10 @@
+package of
+python magic bin (for windows only)
+
+if use linux then change to
+
+sudo apt-get install libmagic1
+https://pypi.org/project/python-magic/
+
+
+package of pscopg2 (linux should install the posgrest first)

@@ -13,9 +13,11 @@ from django.core.mail import send_mail
 
 def createProfile(sender,instance,created,**kwargs):
     if created:
+        random_unique_string = str(get_random_alphanumeric_string(5)) + str(instance.id) + str(get_random_alphanumeric_string(5))
         profile = Profile.objects.create(
             user=instance,
-            public_username=str(get_random_alphanumeric_string(5)) + str(instance.id) + str(get_random_alphanumeric_string(5)),
+            public_username= random_unique_string,
+            name= random_unique_string,
         )
 
         print("createProfile signal was called")
