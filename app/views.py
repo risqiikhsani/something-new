@@ -24,12 +24,12 @@ User = get_user_model()
 from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
-from .serializers import PostList_Serializer
+from .serializers import Post_Serializer
 from .filters import PostFilter
 class PostList(mixins.ListModelMixin,
 				  mixins.CreateModelMixin,
 				  generics.GenericAPIView):
-	serializer_class = PostList_Serializer
+	serializer_class = Post_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	queryset = Post.objects.all()
 	filter_backends = {DjangoFilterBackend,}
@@ -57,13 +57,12 @@ class PostList(mixins.ListModelMixin,
 		serializer.save(user=self.request.user)
 
 
-from .serializers import PostDetail_Serializer
 class PostDetail(mixins.RetrieveModelMixin,
 					mixins.UpdateModelMixin,
 					mixins.DestroyModelMixin,
 					generics.GenericAPIView):
 	queryset = Post.objects.all()				
-	serializer_class = PostDetail_Serializer
+	serializer_class = Post_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 
 	def get(self, request, *args, **kwargs):
@@ -79,9 +78,9 @@ class PostDetail(mixins.RetrieveModelMixin,
 # Using generic class-based views 
 # https://www.django-rest-framework.org/tutorial/3-class-based-views/
 
-from .serializers import CommentList_Serializer
+from .serializers import Comment_Serializer
 class CommentList(generics.ListCreateAPIView):
-	serializer_class = CommentList_Serializer
+	serializer_class = Comment_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	
 	def get_queryset(self):
@@ -94,16 +93,15 @@ class CommentList(generics.ListCreateAPIView):
 		serializer.save(user=self.request.user,post=Post.objects.get(id=self.kwargs['post_id']))
 
 
-from .serializers import CommentDetail_Serializer
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
 	queryset = Comment.objects.all()				
-	serializer_class = CommentDetail_Serializer
+	serializer_class = Comment_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 
 
-from .serializers import ReplyList_Serializer
+from .serializers import Reply_Serializer
 class ReplyList(generics.ListCreateAPIView):
-	serializer_class = ReplyList_Serializer
+	serializer_class = Reply_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	
 	def get_queryset(self):
@@ -117,10 +115,10 @@ class ReplyList(generics.ListCreateAPIView):
 		serializer.save(user=self.request.user,comment=Comment.objects.get(id=self.kwargs['comment_id']))
 
 
-from .serializers import ReplyDetail_Serializer
+
 class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
 	queryset = Reply.objects.all()				
-	serializer_class = ReplyDetail_Serializer
+	serializer_class = Reply_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 
 
