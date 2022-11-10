@@ -115,10 +115,87 @@ class ReplyList(generics.ListCreateAPIView):
 		serializer.save(user=self.request.user,comment=Comment.objects.get(id=self.kwargs['comment_id']))
 
 
-
+from .serializers import Like_Serializer
 class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
 	queryset = Reply.objects.all()				
 	serializer_class = Reply_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 
+
+class LikeList(mixins.ListModelMixin,generics.GenericAPIView):
+	serializer_class = Like_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	
+	def get_queryset(self):
+		if 'post_id' in self.kwargs:
+			return Like.objects.all().filter(post=self.kwargs['post_id'])
+		elif 'comment_id' in self.kwargs:
+			return Like.objects.all().filter(comment=self.kwargs['comment_id'])
+		elif 'reply_id' in self.kwargs:
+			return Like.objects.all().filter(reply=self.kwargs['reply_id'])
+		else:
+			return Like.objects.all()
+	
+
+	def get(self, request, *args, **kwargs):
+		return self.list(request, *args, **kwargs)
+
+class LikeHandler(generics.GenericAPIView):
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+	def get_queryset(self):
+		if 'post_id' in self.kwargs:
+			return Like.objects.all().get(user=self.request.user,post=self.kwargs['post_id'])
+		elif 'comment_id' in self.kwargs:
+			return Like.objects.all().get(user=self.request.user,comment=self.kwargs['comment_id'])
+		elif 'reply_id' in self.kwargs:
+			return Like.objects.all().get(user=self.request.user,reply=self.kwargs['reply_id'])
+
+	def get(self,request,*args,**kwargs):
+		queryset = self.get_queryset()
+		if queryset.exists():
+			queryset.delete()
+			return Response("like has been deleted", status=status.HTTP_201_CREATED)
+		else:
+			if 'post_id' in self.kwargs:
+				like = Like(user=self.request.user,post=self.kwargs['post_id'])
+				like.save()
+			elif 'comment_id' in self.kwargs:
+				like = Like(user=self.request.user,comment=self.kwargs['comment_id'])
+				like.save()
+			elif 'reply_id' in self.kwargs:
+				like = Like(user=self.request.user,reply=self.kwargs['reply_id'])
+				like.save()
+			return Response("like has been created", status=status.HTTP_201_CREATED)
+
+
+class SaveList(mixins.ListModelMixin,generics.GenericAPIView):
+	serializer_class = Like_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	
+	def get_queryset(self):
+		return Save.objects.all().filter(user=self.request.user)
+	
+
+	def get(self, request, *args, **kwargs):
+		return self.list(request, *args, **kwargs)
+
+class SaveHandler(generics.GenericAPIView):
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+	def get_queryset(self):
+		if 'post_id' in self.kwargs:
+			return Save.objects.all().get(user=self.request.user,post=self.kwargs['post_id'])
+
+
+	def get(self,request,*args,**kwargs):
+		queryset = self.get_queryset()
+		if queryset.exists():
+			queryset.delete()
+			return Response("Save has been deleted", status=status.HTTP_201_CREATED)
+		else:
+			if 'post_id' in self.kwargs:
+				save = Save(user=self.request.user,post=self.kwargs['post_id'])
+				save.save()
+			return Response("Save has been created", status=status.HTTP_201_CREATED)
 
