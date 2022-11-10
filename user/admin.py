@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-from .models import CustomUser, Profile
+from .models import CustomUser, Profile, Connection
 
 
 from django import forms
@@ -121,3 +121,13 @@ class ProfileAdmin(admin.ModelAdmin):
 	)
 	list_filter = ('user',)
 	search_fields = ('name',)
+
+
+
+
+
+@admin.register(Connection)
+class ConnectionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user')
+    list_filter = ('user',)
+    raw_id_fields = ('connected',)
