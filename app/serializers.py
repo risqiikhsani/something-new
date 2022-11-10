@@ -46,6 +46,9 @@ class Post_Serializer(serializers.ModelSerializer):
 
 
 
+
+
+
 class Comment_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
     likes_amount = serializers.IntegerField(source="get_likes_amount")
@@ -78,3 +81,13 @@ class Reply_Serializer(serializers.ModelSerializer):
             return True
         else:
             return False
+
+
+class Like_Serializer(serializers.ModelSerializer):
+    user = User_Serializer(required=False)
+
+    class Meta:
+        model = Like
+        fields = ['user']
+        read_only_fields = ['user']
+
