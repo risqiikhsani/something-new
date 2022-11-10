@@ -69,10 +69,10 @@ class Reply(models.Model):
 
 class Report(models.Model):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
-	to_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="reported")
-	to_post = models.ForeignKey(Post, on_delete=models.CASCADE)
-	to_comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
-	to_reply = models.ForeignKey(Reply, on_delete=models.CASCADE)
+	to_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="reported",null=True,blank=True)
+	to_post = models.ForeignKey(Post, on_delete=models.CASCADE,null=True,blank=True)
+	to_comment = models.ForeignKey(Comment, on_delete=models.CASCADE,null=True,blank=True)
+	to_reply = models.ForeignKey(Reply, on_delete=models.CASCADE,null=True,blank=True)
 
 	def __str__(self):
 		return str(self.id)

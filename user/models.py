@@ -54,6 +54,13 @@ class Profile(models.Model):
 		return str(self.id)
 
 
+class Connection(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	connected = models.ManyToManyField('self',null=True,blank=True)
+
+	def __str__(self):
+		return str(self.id)
+
 # class Account(models.Model):
 # 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
