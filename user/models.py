@@ -56,7 +56,7 @@ class Profile(models.Model):
 
 class Connection(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	connected = models.ManyToManyField('self',null=True,blank=True)
+	connected = models.ManyToManyField('self',blank=True)
 
 	def __str__(self):
 		return str(self.id)
