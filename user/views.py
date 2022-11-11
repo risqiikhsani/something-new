@@ -59,3 +59,26 @@ class UserDetail(mixins.RetrieveModelMixin,
 
 	def get(self, request, *args, **kwargs):
 		return self.retrieve(request, *args, **kwargs)
+
+
+
+from .serializers import Connection_Serializer
+class ConnectionList(mixins.ListModelMixin,generics.GenericAPIView):
+	serializer_class = Connection_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	def get_queryset(self):
+		return Connection.objects.all().get(user=self.request.user)
+
+	def get(self, request, *args, **kwargs):
+		return self.list(request,*args,**kwargs)
+
+from .serializers import Request_Serializer
+class RequestList(mixins.ListModelMixin,generics.GenericAPIView):
+	serializer_class = Request_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	def get_queryset(self):
+		return Request.objects.all().filter(user=self.request.user)
+
+	def get(self, request, *args, **kwargs):
+		return self.list(request,*args,**kwargs)
+
