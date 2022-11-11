@@ -61,6 +61,16 @@ class Connection(models.Model):
 	def __str__(self):
 		return str(self.id)
 
+
+class Request(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	sender = models.ForeignKey(User,related_name="request_to", on_delete=models.CASCADE)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True)
+
+	def __str__(self):
+		return str(self.id)
+
+
 # class Account(models.Model):
 # 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
