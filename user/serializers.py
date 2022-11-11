@@ -11,7 +11,7 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-class Profile_Serializer(serializers.ModelSerializer):
+class Profile_Simple_Serializer(serializers.ModelSerializer):
 	profile_picture = VersatileImageFieldSerializer(
 		sizes=[
 			('full_size', 'url'),
@@ -28,11 +28,21 @@ class Profile_Serializer(serializers.ModelSerializer):
 	)
 	class Meta:
 		model = Profile
-		fields = ['name','public_username','about','profile_picture','poster_picture']
+		fields = ['name','public_username','profile_picture','poster_picture']
 
 class User_Serializer(serializers.ModelSerializer):
-	profile = Profile_Serializer()
+	profile = Profile_Simple_Serializer()
 	
 	class Meta:
 		model = CustomUser
 		fields = ['id','profile']
+
+class Connection_Serializer(serializers.ModelSerializer):
+	class Meta:
+		model = Connection
+		fields = '__all__'
+
+class Request_Serializer(serializers.ModelSerializer):
+	class Meta:
+		model = Request
+		fields = '__all__'

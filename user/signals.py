@@ -20,6 +20,10 @@ def createProfile(sender,instance,created,**kwargs):
             name= random_unique_string,
         )
 
+        connection = Connection.objects.create(
+            user=instance,
+        )
+
         print("createProfile signal was called")
 
         #send email
