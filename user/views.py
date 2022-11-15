@@ -11,7 +11,7 @@ from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 
-from rest_framework import generics, mixins, response, decorators, permissions, status
+from rest_framework import generics, mixins, response, decorators, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.decorators import api_view
@@ -60,6 +60,52 @@ class UserDetail(mixins.RetrieveModelMixin,
 
 	def get(self, request, *args, **kwargs):
 		return self.retrieve(request, *args, **kwargs)
+
+class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
+	serializer_class = Connection_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+	queryset = Connection.objects.all()
+
+	def list(self):
+		queryset = self.get_queryset().get(user=self.request.user).connected.all()
+		serializer = self.get_serializer(queryset, many=True)
+		return Response(serializer.data)
+
+	def user_connection_list(self,request,pk=None):
+		user = get_object_or_404(User, pk=pk)
+		queryset = self.get_queryset().get(user=user).connected.all()
+		serializer = self.get_serializer(queryset, many=True)
+		return Response(serializer.data)
+	
+	def block_connection(self,request,pk=None):
+		queryset = self.get_queryset().get(user=self.request.user)
+		connection = get_object_or_404(queryset.connected.all(), pk=pk)
+		queryset.remove(connection)
+		return Response("connection is successfully blocked")
+
+		
+class RequestViewSet(viewsets.ReadOnlyModelViewSet):
+	serializer_class = Request_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+
+	def get_queryset(self):
+		return get_list_or_404(Request, user=self.request.user)
+
+	def list(self):
+		queryset = self.get_queryset()
+		serializer = self.get_serializer(queryset, many=True)
+		return Response(serializer.data)
+
+	def accept_request(self,request,pk=None):
+		queryset = self.get_queryset()
+		request = get_object_or_404(queryset, pk=pk)
+		
+
+
+
+	
+
+
 
 
 # class ConnectionList(mixins.ListModelMixin, generics.GenericAPIView):

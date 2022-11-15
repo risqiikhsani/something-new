@@ -17,7 +17,23 @@ from .views import (
     api_root,
     UserList,
     UserDetail,
+
+    ConnectionViewSet,
 )   
+
+
+my_connection_list = ConnectionViewSet.as_view({
+    'get':'list'
+})
+
+user_connection_list = ConnectionViewSet.as_view({
+    'get':'user_connection_list'
+})
+
+connection_detail_block = ConnectionViewSet.as_View({
+    'get':'block_connection'
+})
+
 
 
 urlpatterns = [
@@ -28,4 +44,11 @@ urlpatterns = [
     path('', api_root),
     path('user-list/',UserList.as_view(), name='user-list'),
     path('user-detail/',UserDetail.as_view(), name="user-detail"),
+
+    path('my-connection-list/',my_connection_list, name="connection-list"),
+    path('user/<int:pk>/connection-list/', user_connection_list, name="connection-list"),
+    path('connection/<int:pk>/block/', connection_detail_block, name='connection-detail-block'),
+
+
+
 ]
