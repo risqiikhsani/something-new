@@ -62,61 +62,61 @@ class UserDetail(mixins.RetrieveModelMixin,
 		return self.retrieve(request, *args, **kwargs)
 
 
-class ConnectionList(mixins.ListModelMixin, generics.GenericAPIView):
-	serializer_class = Connection_Serializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class ConnectionList(mixins.ListModelMixin, generics.GenericAPIView):
+# 	serializer_class = Connection_Serializer
+# 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-	def get_queryset(self):
-		connection = Connection.objects.get(user=self.request.user)
-		return connection.connected.all()
+# 	def get_queryset(self):
+# 		connection = Connection.objects.get(user=self.request.user)
+# 		return connection.connected.all()
 
-	def get(self, request, *args, **kwargs):
-		return self.list(request, *args, **kwargs)
-
-
-class ConnetionDetail(generics.GenericAPIView):
-	serializer_class = Connection_Serializer
-	permission_classes = [
-	    permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-	def get_queryset(self):
-		return get_object_or_404(Connection, user=self.request.user)
-
-	def get(self, request, *args, **kwargs):
-		queryset = self.get_queryset()
-		connected = get_object_or_404(
-		    queryset.connected.all(), id=self.kwargs['connection_id'])
-		serializer = self.get_serializer(instance=connected)
-		return Response(serializer.data)
-
-	def delete(self, request, *args, **kwargs):
-		queryset = self.get_queryset()
-		connected = get_object_or_404(
-		    queryset.connected.all(), id=self.kwargs['connection_id'])
-		queryset.remove(connected)
-		return Response("deleted", status=status.HTTP_204_NO_CONTENT)
+# 	def get(self, request, *args, **kwargs):
+# 		return self.list(request, *args, **kwargs)
 
 
-class RequestList(mixins.ListModelMixin, generics.GenericAPIView):
-	serializer_class = Request_Serializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+# class ConnetionDetail(generics.GenericAPIView):
+# 	serializer_class = Connection_Serializer
+# 	permission_classes = [
+# 	    permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-	def get_queryset(self):
-		return Request.objects.all().filter(user=self.request.user)
+# 	def get_queryset(self):
+# 		return get_object_or_404(Connection, user=self.request.user)
 
-	def get(self, request, *args, **kwargs):
-		return self.list(request, *args, **kwargs)
+# 	def get(self, request, *args, **kwargs):
+# 		queryset = self.get_queryset()
+# 		connected = get_object_or_404(
+# 		    queryset.connected.all(), id=self.kwargs['connection_id'])
+# 		serializer = self.get_serializer(instance=connected)
+# 		return Response(serializer.data)
+
+# 	def delete(self, request, *args, **kwargs):
+# 		queryset = self.get_queryset()
+# 		connected = get_object_or_404(
+# 		    queryset.connected.all(), id=self.kwargs['connection_id'])
+# 		queryset.remove(connected)
+# 		return Response("deleted", status=status.HTTP_204_NO_CONTENT)
 
 
-class RequestDetail(mixins.RetrieveModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
-	serializer_class = Request_Serializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-	queryset = Request.objects.all()
+# class RequestList(mixins.ListModelMixin, generics.GenericAPIView):
+# 	serializer_class = Request_Serializer
+# 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+# 	def get_queryset(self):
+# 		return Request.objects.all().filter(user=self.request.user)
+
+# 	def get(self, request, *args, **kwargs):
+# 		return self.list(request, *args, **kwargs)
+
+
+# class RequestDetail(mixins.RetrieveModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+# 	serializer_class = Request_Serializer
+# 	permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+# 	queryset = Request.objects.all()
 
 
 
-	def get(self, request, *args, **kwargs):
-		return self.retrieve(request, *args, **kwargs)
+# 	def get(self, request, *args, **kwargs):
+# 		return self.retrieve(request, *args, **kwargs)
 	
-	def delete(self, request, *args, **kwargs):
-		return self.destroy(request, *args, **kwargs)
+# 	def delete(self, request, *args, **kwargs):
+# 		return self.destroy(request, *args, **kwargs)
