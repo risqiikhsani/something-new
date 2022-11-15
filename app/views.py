@@ -173,9 +173,15 @@ class LikeList(mixins.ListModelMixin, generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-class LikeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = Like_Serializer
+# class LikeViewSet(viewsets.ReadOnlyModelViewSet):
+#     queryset = Like.objects.all()
+#     serializer_class = Like_Serializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+
+#     @action(detail=False,)
+#     def list(self,request,*args,**kwargs):
+
+
     
 
 
