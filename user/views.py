@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import generics, mixins, response, decorators, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.reverse import reverse
 # Token
 from django.contrib.auth import authenticate
@@ -72,14 +72,15 @@ class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 		return Response(serializer.data)
 
 	def user_connection_list(self,request,pk=None):
-		user = get_object_or_404(User, pk=pk)
+		user = get_object_or_404(User, id=self.kwargs['user_id'])
 		queryset = self.get_queryset().get(user=user).connected.all()
 		serializer = self.get_serializer(queryset, many=True)
 		return Response(serializer.data)
 	
+	@action(detail=True)
 	def block_connection(self,request,pk=None):
-		queryset = self.get_queryset().get(user=self.request.user)
-		connection = get_object_or_404(queryset.connected.all(), pk=pk)
+		queryset = self.get_queryset().get(user=self.request.user).connected.all()
+		connection = get_object_or_404(queryset, pk=pk)
 		queryset.remove(connection)
 		return Response("connection is successfully blocked")
 
@@ -89,17 +90,49 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 
 	def get_queryset(self):
-		return get_list_or_404(Request, user=self.request.user)
+		return Request.objects.all()
 
 	def list(self):
 		queryset = self.get_queryset()
-		serializer = self.get_serializer(queryset, many=True)
+		my_request_list = get_list_or_404(queryset, user=self.request.user)
+		serializer = self.get_serializer(my_request_list, many=True)
 		return Response(serializer.data)
 
+
+	def send_request(self,request,pk=None):
+		user = get_object_or_404(User, id=self.kwargs['user_id'])
+		obj, created = Request.get_or_create(user=user, sender=self.request.user )
+		if created:
+			return Response("failed , request already exists",status=status.HTTP_404_NOT_FOUND)
+		obj.save()
+		return Response("request has been sent",status=status.HTTP_201_CREATED)
+
+
+	def cancel_sent_request(self,request,pk=None):
+		user = get_object_or_404(User, id=self.kwargs['user_id'])
+		obj = Request.objects.get(user=user, sender=self.request.user)
+		if Request.DoesNotExist():
+			return Response("failed, request isn't exists",status=status.HTTP_404_NOT_FOUND)
+		obj.delete()
+		return Response("successfully cancel the request",status=status.HTTP_200_OK)
+
+	@action(detail=True)
 	def accept_request(self,request,pk=None):
 		queryset = self.get_queryset()
-		request = get_object_or_404(queryset, pk=pk)
-		
+		obj = get_object_or_404(queryset, pk=pk)
+		if obj.user == self.request.user:
+			obj.accept = True
+			return Response("sucessfully accept request",status=status.HTTP_200_OK)
+		return Response("UNAUTHORIZED",status=status.HTTP_401_UNAUTHORIZED)
+
+	@action(detail=True)
+	def decline_request(self,request,pk=None):
+		queryset = self.get_queryset()
+		obj = get_object_or_404(queryset, pk=pk)
+		if obj.user == self.request.user:
+			obj.decline = True
+			return Response("sucessfully decline request",status=status.HTTP_200_OK)
+		return Response("UNAUTHORIZED",status=status.HTTP_401_UNAUTHORIZED)
 
 
 
