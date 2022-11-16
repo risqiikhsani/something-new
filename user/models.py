@@ -66,6 +66,8 @@ class Request(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	sender = models.ForeignKey(User,related_name="request_to", on_delete=models.CASCADE)
 	time_creation = models.DateTimeField(auto_now_add=True,null=True)
+	accept = models.BooleanField(default=False,null=True,blank=True)
+	decline = models.BooleanField(default=False,null=True,blank=True)
 
 	def __str__(self):
 		return str(self.id)

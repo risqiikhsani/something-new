@@ -30,7 +30,7 @@ user_connection_list = ConnectionViewSet.as_view({
     'get':'user_connection_list'
 })
 
-connection_detail_block = ConnectionViewSet.as_View({
+connection_detail_block = ConnectionViewSet.as_view({
     'get':'block_connection'
 })
 
