@@ -19,6 +19,7 @@ from .views import (
     UserDetail,
 
     ConnectionViewSet,
+    RequestViewSet,
 )   
 
 
@@ -34,6 +35,26 @@ connection_detail_block = ConnectionViewSet.as_view({
     'get':'block_connection'
 })
 
+
+request_list = RequestViewSet.as_view({
+    'get':'list'
+})
+
+send_request = RequestViewSet.as_view({
+    'get':'send_request'
+})
+
+cancel_sent_request = RequestViewSet.as_view({
+    'get':'cancel_sent_request'
+})
+
+accept_request = RequestViewSet.as_view({
+    'get':'accept_request'
+})
+
+decline_request = RequestViewSet.as_view({
+    'get':'decline_request'
+})
 
 
 urlpatterns = [
