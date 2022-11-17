@@ -27,19 +27,19 @@ class Post_Serializer(serializers.ModelSerializer):
 	# def get_liked(self,obj):
 	# 	if obj.like_set
     def get_liked(self,obj):
-        if obj.like_set.all().get(user=self.context['request'].user).exists():
+        if obj.like_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
 
     def get_shared(self,obj):
-        if obj.share_set.all().get(user=self.context['request'].user).exists():
+        if obj.share_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
 
     def get_saved(self,obj):
-        if obj.save_set.all().get(user=self.context['request'].user).exists():
+        if obj.save_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
@@ -60,7 +60,7 @@ class Comment_Serializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'post']
 
     def get_liked(self,obj):
-        if obj.like_set.all().get(user=self.context['request'].user).exists():
+        if obj.like_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
@@ -77,7 +77,7 @@ class Reply_Serializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'comment']
 
     def get_liked(self,obj):
-        if obj.like_set.all().get(user=self.context['request'].user).exists():
+        if obj.like_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
