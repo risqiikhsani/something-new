@@ -11,20 +11,23 @@ from django.conf import settings
 
 from django.core.mail import send_mail
 
-def createProfile(sender,instance,created,**kwargs):
+def userMainSignal(sender,instance,created,**kwargs):
     if created:
+        print("signal : create profile")
         random_unique_string = str(get_random_alphanumeric_string(5)) + str(instance.id) + str(get_random_alphanumeric_string(5))
+        # create profile
         profile = Profile.objects.create(
             user=instance,
             public_username= random_unique_string,
             name= random_unique_string,
         )
 
+        # create connection
         connection = Connection.objects.create(
             user=instance,
         )
 
-        print("createProfile signal was called")
+        
 
         #send email
         # app_name = "Testing"
@@ -35,5 +38,20 @@ def createProfile(sender,instance,created,**kwargs):
         # recepient_list = [instance.email,]
         # send_mail(subject,message,email_from,recepient_list)
 
+
                 
-post_save.connect(createProfile,sender=User,dispatch_uid="unique")
+post_save.connect(userMainSignal,sender=User,dispatch_uid="unique")
+
+def requestMainSignal(sender,instance,created,**kwargs):
+    # if user accept the friend request , user will be friend/connected with the request sender
+    if instance.accept == True:
+        print("signal : connection handler")
+        instance.user.connection.connected.add(instance.sender.connection)
+
+    # if user decline the friend request , request will be deleted
+    if instance.decline == True:
+        print("signal : connection handler")
+        instance.delete()
+
+
+post_save.connect(requestMainSignal,sender=Request,dispatch_uid="unique")
