@@ -66,23 +66,26 @@ class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 	queryset = Connection.objects.all()
 
-	def list(self):
-		queryset = self.get_queryset().get(user=self.request.user).connected.all()
-		serializer = self.get_serializer(queryset, many=True)
+	def list(self,request):
+		queryset = self.get_queryset()
+		connection = get_object_or_404(queryset, user=self.request.user)
+		connections = connection.connected.all()
+		serializer = self.get_serializer(connections, many=True)
 		return Response(serializer.data)
 
 	def user_connection_list(self,request,pk=None):
-		user = get_object_or_404(User, id=self.kwargs['user_id'])
+		user = get_object_or_404(User, pk=pk)
 		queryset = self.get_queryset().get(user=user).connected.all()
 		serializer = self.get_serializer(queryset, many=True)
 		return Response(serializer.data)
 	
 	@action(detail=True)
 	def block_connection(self,request,pk=None):
-		queryset = self.get_queryset().get(user=self.request.user).connected.all()
+		queryset = self.get_queryset()
 		connection = get_object_or_404(queryset, pk=pk)
-		queryset.remove(connection)
-		return Response("connection is successfully blocked")
+		my_connection = self.request.user.connection
+		my_connection.connected.remove(connection)
+		return Response("connection is successfully blocked",status=status.HTTP_200_OK)
 
 		
 class RequestViewSet(viewsets.ReadOnlyModelViewSet):
@@ -92,7 +95,7 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 	def get_queryset(self):
 		return Request.objects.all()
 
-	def list(self):
+	def list(self,request):
 		queryset = self.get_queryset()
 		my_request_list = get_list_or_404(queryset, user=self.request.user)
 		serializer = self.get_serializer(my_request_list, many=True)

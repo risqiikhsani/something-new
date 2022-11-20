@@ -35,7 +35,7 @@ urlpatterns = [
     path('user-detail/',UserDetail.as_view(), name="user-detail"),
 
     path('connections/',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),
-    path('user/<int:user_id>/connections/',ConnectionViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
+    path('user/<int:pk>/connections/',ConnectionViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
     path('connections/<int:pk>/block/',ConnectionViewSet.as_view({'get':'block_connection'}), name='connection-detail-block'),
 
     path('requests/',RequestViewSet.as_view({'get':'list'}), name='request-list'),
