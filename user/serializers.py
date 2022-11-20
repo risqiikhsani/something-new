@@ -38,11 +38,13 @@ class User_Serializer(serializers.ModelSerializer):
 		fields = ['id','profile']
 
 class Connection_Serializer(serializers.ModelSerializer):
+	user = User_Serializer()
 	class Meta:
 		model = Connection
-		fields = '__all__'
+		fields = ['id','user']
 
 class Request_Serializer(serializers.ModelSerializer):
+	sender = User_Serializer()
 	class Meta:
 		model = Request
 		fields = '__all__'
