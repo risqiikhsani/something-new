@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save,m2m_changed
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -55,3 +55,19 @@ def requestMainSignal(sender,instance,created,**kwargs):
 
 
 post_save.connect(requestMainSignal,sender=Request,dispatch_uid="unique")
+
+# https://docs.djangoproject.com/en/4.1/ref/signals/#m2m-changed
+def connectionMainSignal(sender,instance,action,pk_set,model,**kwargs):
+    if action == 'post_add':
+        # create relationship
+        user = instance.user
+        to_user = model.objects.get(pk=pk_set).user
+        obj = Relationship.create(
+            user = user,
+            to_user = to_user,
+        )
+        obj.save()
+    elif action == 'post_remove':
+        pass
+
+m2m_changed.connect(connectionMainSignal,sender=Connection.connected.through)
