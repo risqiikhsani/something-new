@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-from .models import CustomUser, Profile, Connection, Request
+from .models import CustomUser, Profile, Connection, Request,Relationship
 
 
 from django import forms
@@ -131,6 +131,27 @@ class ConnectionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'user')
     list_filter = ('user',)
     raw_id_fields = ('connected',)
+
+@admin.register(Relationship)
+class RelationshipAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'to_user',
+        'block',
+        'pin',
+        'follow',
+        'notification',
+        'nickname',
+    )
+    list_filter = (
+        'user',
+        'to_user',
+        'block',
+        'pin',
+        'follow',
+        'notification',
+    )
 
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
