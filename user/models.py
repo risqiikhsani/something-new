@@ -65,6 +65,7 @@ class Relationship(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="relationship_by")
 	block = models.BooleanField(default=False)
+	unfriend = models.BooleanField(default=False)
 	pin = models.BooleanField(default=False)
 	follow = models.BooleanField(default=True)
 	notification = models.BooleanField(default=False)
