@@ -60,14 +60,46 @@ post_save.connect(requestMainSignal,sender=Request,dispatch_uid="unique")
 def connectionMainSignal(sender,instance,action,pk_set,model,**kwargs):
     if action == 'post_add':
         # create relationship
+        print(sender)
+        print(instance)
+        print(action)
+        print(pk_set)
+        print(model)
+        # <class 'user.models.Connection_connected'>
+        # 2
+        # post_add
+        # {1}
+        # <class 'user.models.Connection'>
         user = instance.user
-        to_user = model.objects.get(pk=pk_set).user
+        to_user = model.objects.get(pk=list(pk_set)[0]).user
+
+        # create 2 relationships for each?
         obj = Relationship.create(
             user = user,
             to_user = to_user,
         )
         obj.save()
+
+        obj2 = Relationship.create(
+            user= to_user,
+            to_user = user,
+        )
+
+        obj2.save()
     elif action == 'post_remove':
         pass
 
 m2m_changed.connect(connectionMainSignal,sender=Connection.connected.through)
+
+def relationshipMainSignal(sender,instance,created,**kwargs):
+    if instance.block == True:
+        c = Connection.object.get(user=instance.user)
+        obj = Connection.object.get(user=instance.to_user)
+        c.connected.remove(obj)
+
+    if instance.block == False:
+        c = Connection.object.get(user=instance.user)
+        obj = Connection.object.get(user=instance.to_user)
+        c.connected.add(obj)
+
+post_save.connect(relationshipMainSignal,sender=Relationship,dispatch_uid="unique")
