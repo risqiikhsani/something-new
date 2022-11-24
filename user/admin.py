@@ -132,28 +132,26 @@ class ConnectionsAdmin(admin.ModelAdmin):
     list_filter = ('user',)
     raw_id_fields = ('connected',)
 
-@admin.register(Relationship)
-class RelationshipAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'user',
-        'to_user',
-        'block',
-        'unfriend',
-        'pin',
-        'follow',
-        'notification',
-        'nickname',
-    )
-    list_filter = (
-        'user',
-        'to_user',
-        'block',
-        'unfriend',
-        'pin',
-        'follow',
-        'notification',
-    )
+# @admin.register(Relationship)
+# class RelationshipAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'id',
+#         'user',
+#         'to_user',
+#         'block',
+#         'pin',
+#         'follow',
+#         'notification',
+#         'nickname',
+#     )
+#     list_filter = (
+#         'user',
+#         'to_user',
+#         'block',
+#         'pin',
+#         'follow',
+#         'notification',
+#     )
 
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
