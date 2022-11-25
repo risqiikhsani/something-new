@@ -56,61 +56,61 @@ def requestAction(sender,instance,created,**kwargs):
 
 post_save.connect(requestAction,sender=Request,dispatch_uid="unique")
 
-# # https://docs.djangoproject.com/en/4.1/ref/signals/#m2m-changed
-# def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
-#     if action == 'post_add':
-#         # create relationship
-#         print(sender)
-#         print(instance)
-#         print(action)
-#         print(pk_set)
-#         print(model)
-#         # <class 'user.models.Connection_connected'>
-#         # 2
-#         # post_add
-#         # {1}
-#         # <class 'user.models.Connection'>
-#         user = instance.user
-#         to_user = model.objects.get(pk=list(pk_set)[0]).user
 
-#         # create 2 relationships for each?
-#         obj,created = Relationship.get_or_create(
-#             user = user,
-#             to_user = to_user,
-#         )
-#         obj.save()
+# https://docs.djangoproject.com/en/4.1/ref/signals/#m2m-changed
+def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
+    if action == 'post_add':
+        print(sender)
+        print(instance)
+        print(action)
+        print(pk_set)
+        print(model)
+        # <class 'user.models.Connection_connected'>
+        # 2
+        # post_add
+        # {1}
+        # <class 'user.models.Connection'>
 
-#         obj2, created = Relationship.get_or_create(
-#             user= to_user,
-#             to_user = user,
-#         )
-#         obj2.save()
+        # create 2 relationship for each
+        user = instance.user
+        to_user = model.objects.get(pk=list(pk_set)[0]).user
 
-#     elif action == 'post_remove':
-#         pass
+        r1,created = Relationship.get_or_create(user = user,to_user = to_user,)
+        r1.save()
 
-# m2m_changed.connect(connectionM2mAction,sender=Connection.connected.through)
+        r2, created = Relationship.get_or_create(user= to_user,to_user = user,)
+        r2.save()
 
-# def relationshipAction(sender,instance,created,**kwargs):
-#     if instance.block == True:
-#         c1 = Connection.object.get(user=instance.user)
-#         c2 = Connection.object.get(user=instance.to_user)
-#         c1.connected.remove(c2)
+    elif action == 'post_remove':
+        # delete 2 relationship for each
+        user = instance.user
+        to_user = model.objects.get(pk=list(pk_set)[0]).user
+        r1 = Relationship.objects.get(user=user,to_user=to_user)
+        r2 = Relationship.objects.get(user=to_user,to_user=user)
+        r1.delete()
+        r2.delete()
 
-#     if instance.block == False:
-#         c1 = Connection.object.get(user=instance.user)
-#         c2 = Connection.object.get(user=instance.to_user)
-#         c1.connected.add(c2)
+m2m_changed.connect(connectionM2mAction,sender=Connection.connected.through)
+
+# when the user block others
+def blockCreatedAction(sender,instance,created,**kwargs):
+    # if the block is created
+    if created:
+        # if connection of them was exist
+        if instance.user.connection.connected.filter(user=instance.blocked).exists():
+            # remove the connection
+            c1 = Connection.objects.get(user=instance.user)
+            c2 = Connection.objects.get(user= instance.blocked)
+            c1.connected.remove(c2)
+
+post_save.connect(blockCreatedAction,sender=Block,dispatch_uid="unique")
 
 
-# post_save.connect(relationshipAction,sender=Relationship,dispatch_uid="unique")
+# when the user unblock others
+def blockDeletedAction(sender,instance,*args,**kwargs):
+    # if request of accepted was exists . means they were friends
+    if Request.objects.filter(user=instance.user,sender=instance.blocked,accept=True).exists():
+        # recreate the connection
+        instance.user.connection.connected.add(instance.blocked.connection)
 
-# def relationshipDeletedAction(sender,instance,*args,**kwargs):
-#     # delete the connections
-#     c1 = Connection.objects.get(user=instance.user)
-#     c2 = Connection.objects.get(user=instance.to_user)
-#     c1.connected.remove(c2)
-
-#     # delete the other's relationship
-
-# post_delete.connect(relationshipDeletedAction,sender=Relationship,dispatch_uid="unique")
+post_delete.connect(blockDeletedAction,sender=Block,dispatch_uid="unique")
