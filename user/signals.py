@@ -114,3 +114,4 @@ def blockDeletedAction(sender,instance,*args,**kwargs):
         instance.user.connection.connected.add(instance.blocked.connection)
 
 post_delete.connect(blockDeletedAction,sender=Block,dispatch_uid="unique")
+
