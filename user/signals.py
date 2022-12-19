@@ -59,6 +59,7 @@ post_save.connect(requestAction,sender=Request,dispatch_uid="unique")
 
 # https://docs.djangoproject.com/en/4.1/ref/signals/#m2m-changed
 def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
+    # if user connected with other user , do this
     if action == 'post_add':
         print(sender)
         print(instance)
@@ -81,6 +82,7 @@ def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
         r2, created = Relationship.get_or_create(user= to_user,to_user = user,)
         r2.save()
 
+    # if user disconnected from other user, do this
     elif action == 'post_remove':
         # delete 2 relationship for each
         user = instance.user

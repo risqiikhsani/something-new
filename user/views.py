@@ -80,12 +80,12 @@ class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 		return Response(serializer.data)
 	
 	@action(detail=True)
-	def block_connection(self,request,pk=None):
+	def remove_connection(self,request,pk=None):
 		queryset = self.get_queryset()
 		connection = get_object_or_404(queryset, pk=pk)
 		my_connection = self.request.user.connection
 		my_connection.connected.remove(connection)
-		return Response("connection is successfully blocked",status=status.HTTP_200_OK)
+		return Response("connection is successfully removed",status=status.HTTP_200_OK)
 
 		
 class RequestViewSet(viewsets.ReadOnlyModelViewSet):
