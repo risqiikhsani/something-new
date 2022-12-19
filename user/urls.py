@@ -36,7 +36,7 @@ urlpatterns = [
 
     path('connections/',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),
     path('user/<int:pk>/connections/',ConnectionViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
-    path('connections/<int:pk>/block/',ConnectionViewSet.as_view({'get':'block_connection'}), name='connection-detail-block'),
+    path('connections/<int:pk>/remove/',ConnectionViewSet.as_view({'get':'remove_connection'}), name='connection-detail-remove'),
 
     path('requests/',RequestViewSet.as_view({'get':'list'}), name='request-list'),
     path('user/<int:user_id>/send_request/',RequestViewSet.as_view({'get':'send_request'}),name='send-request'),

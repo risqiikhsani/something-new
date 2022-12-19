@@ -48,3 +48,14 @@ class Request_Serializer(serializers.ModelSerializer):
 	class Meta:
 		model = Request
 		fields = '__all__'
+
+class Relationship_Serializer(serializers.ModelSerializer):
+
+	class Meta:
+		model = Relationship
+		fields = '__all__'
+
+class Block_Serializer(serializers.ModelSerializer):
+	class Meta:
+		model = Block
+		fields = '__all__'

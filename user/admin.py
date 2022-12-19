@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-from .models import CustomUser, Profile, Connection, Request,Relationship
+from .models import CustomUser, Profile, Connection, Request,Relationship, Block
 
 
 from django import forms
