@@ -43,14 +43,15 @@ def userMainSignal(sender,instance,created,**kwargs):
 post_save.connect(userMainSignal,sender=User,dispatch_uid="unique")
 
 def requestAction(sender,instance,created,**kwargs):
+    print("signal : requestAction")
+    # TESTED = WORKS !
     # if user accept the friend request , user will be friend/connected with the request sender
     if instance.accept == True:
-        print("signal : connection handler")
         instance.user.connection.connected.add(instance.sender.connection)
 
+    # TESTED = WORKS !
     # if user decline the friend request , request will be deleted
     if instance.decline == True:
-        print("signal : connection handler")
         instance.delete()
 
 
@@ -59,13 +60,15 @@ post_save.connect(requestAction,sender=Request,dispatch_uid="unique")
 
 # https://docs.djangoproject.com/en/4.1/ref/signals/#m2m-changed
 def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
+    # TESTED = WORKS !
     # if user connected with other user , do this
     if action == 'post_add':
-        print(sender)
-        print(instance)
-        print(action)
-        print(pk_set)
-        print(model)
+        # print(sender)
+        # print(instance)
+        # print(action)
+        # print(pk_set)
+        
+        # print(model)
         # <class 'user.models.Connection_connected'>
         # 2
         # post_add
@@ -76,21 +79,32 @@ def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
         user = instance.user
         to_user = model.objects.get(pk=list(pk_set)[0]).user
 
-        r1,created = Relationship.get_or_create(user = user,to_user = to_user,)
+        r1,created = Relationship.objects.get_or_create(user = user,to_user = to_user,)
         r1.save()
 
-        r2, created = Relationship.get_or_create(user= to_user,to_user = user,)
+        r2, created = Relationship.objects.get_or_create(user= to_user,to_user = user,)
         r2.save()
 
+    # TESTED = WORKS
     # if user disconnected from other user, do this
     elif action == 'post_remove':
         # delete 2 relationship for each
         user = instance.user
         to_user = model.objects.get(pk=list(pk_set)[0]).user
-        r1 = Relationship.objects.get(user=user,to_user=to_user)
-        r2 = Relationship.objects.get(user=to_user,to_user=user)
-        r1.delete()
-        r2.delete()
+        
+        try:
+            r1 = Relationship.objects.get(user=user,to_user=to_user)
+            r1.delete()
+        # this is for error handler if you deleted the relationship first in django admin
+        except Relationship.DoesNotExist:
+            pass
+
+        try:
+            r2 = Relationship.objects.get(user=to_user,to_user=user)
+            r2.delete()
+        # this is for error handler if you deleted the relationship first in django admin
+        except Relationship.DoesNotExist:
+            pass
 
 m2m_changed.connect(connectionM2mAction,sender=Connection.connected.through)
 
