@@ -20,6 +20,7 @@ from .views import (
 
     ConnectionViewSet,
     RequestViewSet,
+    UserViewSet,
 )   
 
 
@@ -34,14 +35,22 @@ urlpatterns = [
     path('user-list/',UserList.as_view(), name='user-list'),
     path('user-detail/',UserDetail.as_view(), name="user-detail"),
 
+    # WORKS
     path('connections/',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),
-    path('user/<int:pk>/connections/',ConnectionViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
+    # WORKS
+    path('user/<int:pk>/connections/',UserViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
+    # 
     path('connections/<int:pk>/remove/',ConnectionViewSet.as_view({'get':'remove_connection'}), name='connection-detail-remove'),
 
+    # WORKS
     path('requests/',RequestViewSet.as_view({'get':'list'}), name='request-list'),
-    path('user/<int:user_id>/send_request/',RequestViewSet.as_view({'get':'send_request'}),name='send-request'),
-    path('user/<int:user_id>/cancel_sent_request/',RequestViewSet.as_view({'get':'cancel_sent_request'}),name='cancel-sent-request'),
+    # WORKS
+    path('user/<int:pk>/send_request/',UserViewSet.as_view({'get':'send_request'}),name='send-request'),
+    # WORKS
+    path('user/<int:pk>/cancel_sent_request/',UserViewSet.as_view({'get':'cancel_sent_request'}),name='cancel-sent-request'),
+    # WORKS
     path('requests/<int:pk>/accept/',RequestViewSet.as_view({'get':'accept_request'}),name='accept-request'),
+    # WORKS
     path('requests/<int:pk>/decline/',RequestViewSet.as_view({'get':'decline_request'}),name='decline-request'),
 
 ]

@@ -73,11 +73,7 @@ class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 		serializer = self.get_serializer(connections, many=True)
 		return Response(serializer.data)
 
-	def user_connection_list(self,request,pk=None):
-		user = get_object_or_404(User, pk=pk)
-		queryset = self.get_queryset().get(user=user).connected.all()
-		serializer = self.get_serializer(queryset, many=True)
-		return Response(serializer.data)
+
 	
 	@action(detail=True)
 	def remove_connection(self,request,pk=None):
@@ -102,29 +98,13 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 		return Response(serializer.data)
 
 
-	def send_request(self,request,pk=None):
-		user = get_object_or_404(User, id=self.kwargs['user_id'])
-		obj, created = Request.get_or_create(user=user, sender=self.request.user )
-		if created:
-			return Response("failed , request already exists",status=status.HTTP_404_NOT_FOUND)
-		obj.save()
-		return Response("request has been sent",status=status.HTTP_201_CREATED)
-
-
-	def cancel_sent_request(self,request,pk=None):
-		user = get_object_or_404(User, id=self.kwargs['user_id'])
-		obj = Request.objects.get(user=user, sender=self.request.user)
-		if Request.DoesNotExist():
-			return Response("failed, request isn't exists",status=status.HTTP_404_NOT_FOUND)
-		obj.delete()
-		return Response("successfully cancel the request",status=status.HTTP_200_OK)
-
 	@action(detail=True)
 	def accept_request(self,request,pk=None):
 		queryset = self.get_queryset()
 		obj = get_object_or_404(queryset, pk=pk)
 		if obj.user == self.request.user:
 			obj.accept = True
+			obj.save()
 			return Response("sucessfully accept request",status=status.HTTP_200_OK)
 		return Response("UNAUTHORIZED",status=status.HTTP_401_UNAUTHORIZED)
 
@@ -134,14 +114,40 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 		obj = get_object_or_404(queryset, pk=pk)
 		if obj.user == self.request.user:
 			obj.decline = True
+			obj.save()
 			return Response("sucessfully decline request",status=status.HTTP_200_OK)
 		return Response("UNAUTHORIZED",status=status.HTTP_401_UNAUTHORIZED)
 
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+	def get_queryset(self):
+		return User.objects.all()
 
+	@action(detail=True)
+	def send_request(self,request,pk=None):
+		user = get_object_or_404(User, pk=pk)
+		obj, created = Request.objects.get_or_create(user=user, sender=self.request.user )
+		if created == False:
+			return Response("failed , request already exists",status=status.HTTP_404_NOT_FOUND)
+		return Response("request has been sent",status=status.HTTP_201_CREATED)
+
+	@action(detail=True)
+	def cancel_sent_request(self,request,pk=None):
+		user = get_object_or_404(User, pk=pk)
+		obj = Request.objects.get(user=user, sender=self.request.user)
+		if not obj:
+			return Response("failed, request isn't exists",status=status.HTTP_404_NOT_FOUND)
+		obj.delete()
+		return Response("successfully cancel the request",status=status.HTTP_200_OK)
+
+	def user_connection_list(self,request,pk=None):
+		user = get_object_or_404(User, pk=pk)
+		obj = user.connection.connected.all()
+		print(obj)
+		serializer = Connection_Serializer(obj,many=True)
+		return Response(serializer.data)
 	
-
-
 
 
 # class ConnectionList(mixins.ListModelMixin, generics.GenericAPIView):
