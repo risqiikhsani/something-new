@@ -11,9 +11,9 @@ from user.serializers import User_Serializer
 
 class Post_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
-    likes_amount = serializers.IntegerField(source="get_likes_amount")
-    comments_amount = serializers.IntegerField(source="get_comments_amount")
-    shares_amount = serializers.IntegerField(source="get_shares_amount")
+    likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
+    comments_amount = serializers.IntegerField(source="get_comments_amount",required=False)
+    shares_amount = serializers.IntegerField(source="get_shares_amount",required=False)
     liked = serializers.SerializerMethodField()
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
@@ -22,7 +22,7 @@ class Post_Serializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'user', 'text', 'time_creation',
             'likes_amount', 'comments_amount','shares_amount','liked','shared','saved']
-        read_only_fields = ['user']
+        read_only_fields = ['user',]
 
 	# def get_liked(self,obj):
 	# 	if obj.like_set
@@ -51,8 +51,8 @@ class Post_Serializer(serializers.ModelSerializer):
 
 class Comment_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
-    likes_amount = serializers.IntegerField(source="get_likes_amount")
-    replies_amount = serializers.IntegerField(source="get_replies_amount")
+    likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
+    replies_amount = serializers.IntegerField(source="get_replies_amount",required=False)
     liked = serializers.SerializerMethodField()
     class Meta:
         model = Comment
@@ -69,7 +69,7 @@ class Comment_Serializer(serializers.ModelSerializer):
 
 class Reply_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
-    likes_amount = serializers.IntegerField(source="get_likes_amount")
+    likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
     liked = serializers.SerializerMethodField()
     class Meta:
         model = Reply
