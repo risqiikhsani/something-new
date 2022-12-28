@@ -12,7 +12,7 @@ from django.db.models import Q
 
 from django.core.exceptions import ValidationError
 
-from rest_framework import generics, mixins, response, decorators, permissions, status, viewsets
+from rest_framework import generics, mixins, response, decorators, permissions, status, viewsets, filters
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.decorators import api_view
@@ -37,9 +37,15 @@ class PostList(mixins.ListModelMixin,
                generics.GenericAPIView):
     serializer_class = Post_Serializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = Post.objects.all()
-    filter_backends = {DjangoFilterBackend, }
+    queryset = Post.objects.all().order_by('-time_creation')
+    # https://www.django-rest-framework.org/api-guide/filtering/
+    filter_backends = [
+        DjangoFilterBackend,
+        # filters.SearchFilter
+    ]
     filterset_class = PostFilter
+    # filterset_fields = ['category', 'in_stock']
+    # search_fields = ['text']
 
     # def get_queryset(self):
     # 	if 'user_id' in self.kwargs:
@@ -90,9 +96,9 @@ class CommentList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         if 'post_id' in self.kwargs:
-            return Comment.objects.all().filter(post=self.kwargs['post_id'])
+            return Comment.objects.all().filter(post=self.kwargs['post_id']).order_by('-time_creation')
         else:
-            return Comment.objects.all()
+            return Comment.objects.all().order_by('-time_creation')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user,
@@ -112,9 +118,9 @@ class ReplyList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         if 'comment_id' in self.kwargs:
-            return Reply.objects.all().filter(comment=self.kwargs['comment_id'])
+            return Reply.objects.all().filter(comment=self.kwargs['comment_id']).order_by('-time_creation')
         else:
-            return Reply.objects.all()
+            return Reply.objects.all().order_by('-time_creation')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user, comment=Comment.objects.get(
