@@ -24,22 +24,27 @@ class Post_Serializer(serializers.ModelSerializer):
             'likes_amount', 'comments_amount','shares_amount','liked','shared','saved']
         read_only_fields = ['user',]
 
-	# def get_liked(self,obj):
-	# 	if obj.like_set
     def get_liked(self,obj):
-        if obj.like_set.all().filter(user=self.context['request'].user).exists():
+        # will work even no authenticated user
+        if self.context['request'].user.id == None:
+            return False
+        elif obj.like_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
 
     def get_shared(self,obj):
-        if obj.share_set.all().filter(user=self.context['request'].user).exists():
+        if self.context['request'].user.id == None:
+            return False
+        elif obj.share_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
 
     def get_saved(self,obj):
-        if obj.save_set.all().filter(user=self.context['request'].user).exists():
+        if self.context['request'].user.id == None:
+            return False
+        elif obj.save_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
@@ -60,7 +65,9 @@ class Comment_Serializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'post']
 
     def get_liked(self,obj):
-        if obj.like_set.all().filter(user=self.context['request'].user).exists():
+        if self.context['request'].user.id == None:
+            return False
+        elif obj.like_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
@@ -77,7 +84,9 @@ class Reply_Serializer(serializers.ModelSerializer):
         read_only_fields = ['user', 'comment']
 
     def get_liked(self,obj):
-        if obj.like_set.all().filter(user=self.context['request'].user).exists():
+        if self.context['request'].user.id == None:
+            return False
+        elif obj.like_set.all().filter(user=self.context['request'].user).exists():
             return True
         else:
             return False
