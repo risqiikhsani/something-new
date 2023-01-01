@@ -36,7 +36,7 @@ class PostList(mixins.ListModelMixin,
                mixins.CreateModelMixin,
                generics.GenericAPIView):
     serializer_class = Post_Serializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Post.objects.all().order_by('-time_creation')
     # https://www.django-rest-framework.org/api-guide/filtering/
     filter_backends = [
