@@ -152,9 +152,6 @@ class ReplyDetail(generics.RetrieveUpdateDestroyAPIView):
 #         pass
 
 
-
-
-
 #         def get_permissions(self):
 #     if self.action == 'list':
 #         permission_classes = [IsAuthenticated]
@@ -188,40 +185,35 @@ class LikeList(mixins.ListModelMixin, generics.GenericAPIView):
 #     def list(self,request,*args,**kwargs):
 
 
-    
-
-
-
 class LikeHandler(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         if 'post_id' in self.kwargs:
-            return Like.objects.all().get(user=self.request.user, post=self.kwargs['post_id'])
+            return Post.objects.get(id=self.kwargs['post_id'])
         elif 'comment_id' in self.kwargs:
-            return Like.objects.all().get(user=self.request.user, comment=self.kwargs['comment_id'])
+            return Comment.objects.get(id=self.kwargs['comment_id'])
         elif 'reply_id' in self.kwargs:
-            return Like.objects.all().get(user=self.request.user, reply=self.kwargs['reply_id'])
-
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        if queryset.exists():
+            return Reply.objects.get(id=self.kwargs['reply_id'])
+    def get(self,request,*args,**kwargs):
+        if self.get_queryset().like_set.filter(user=self.request.user).exists():
+            queryset = self.get_queryset().like_set.filter(user=self.request.user).first()
             queryset.delete()
-            return Response("like has been deleted", status=status.HTTP_201_CREATED)
+            return Response({"liked": False}, status=status.HTTP_200_OK)     
         else:
             if 'post_id' in self.kwargs:
                 like = Like(user=self.request.user,
-                            post=self.kwargs['post_id'])
+                            post=self.get_queryset())
                 like.save()
             elif 'comment_id' in self.kwargs:
                 like = Like(user=self.request.user,
-                            comment=self.kwargs['comment_id'])
+                            comment=self.get_queryset())
                 like.save()
             elif 'reply_id' in self.kwargs:
                 like = Like(user=self.request.user,
-                            reply=self.kwargs['reply_id'])
+                            reply=self.get_queryset())
                 like.save()
-            return Response("like has been created", status=status.HTTP_201_CREATED)
+            return Response({"liked": True}, status=status.HTTP_200_OK)
 
 
 class SaveList(mixins.ListModelMixin, generics.GenericAPIView):
@@ -240,16 +232,17 @@ class SaveHandler(generics.GenericAPIView):
 
     def get_queryset(self):
         if 'post_id' in self.kwargs:
-            return Save.objects.all().get(user=self.request.user, post=self.kwargs['post_id'])
+            return Post.objects.get(id=self.kwargs['post_id'])
 
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        if queryset.exists():
+    def get(self,request,*args,**kwargs):
+        if self.get_queryset().save_set.filter(user=self.request.user).exists():
+            queryset = self.get_queryset().save_set.filter(user=self.request.user).first()
             queryset.delete()
-            return Response("Save has been deleted", status=status.HTTP_201_CREATED)
+            return Response({"saved": False}, status=status.HTTP_200_OK)     
         else:
             if 'post_id' in self.kwargs:
                 save = Save(user=self.request.user,
-                            post=self.kwargs['post_id'])
+                            post=self.get_queryset())
                 save.save()
-            return Response("Save has been created", status=status.HTTP_201_CREATED)
+
+            return Response({"saved": True}, status=status.HTTP_200_OK)
