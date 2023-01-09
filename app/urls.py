@@ -46,7 +46,7 @@ urlpatterns = [
     path('saved-items/',SaveList.as_view(), name='save-list'),
 
     path('post/<int:post_id>/savehandler', SaveHandler.as_view(), name='save-handler-post'),
-    path('comment/<int:comment_id>/savehandler', SaveHandler.as_view(), name='save-handler-comment'),
-    path('reply/<int:reply_id>/savehandler', SaveHandler.as_view(), name='save-handler-reply'),
+    # path('comment/<int:comment_id>/savehandler', SaveHandler.as_view(), name='save-handler-comment'),
+    # path('reply/<int:reply_id>/savehandler', SaveHandler.as_view(), name='save-handler-reply'),
 
 ]
