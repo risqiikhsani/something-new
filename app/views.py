@@ -200,27 +200,27 @@ class LikeHandler(generics.GenericAPIView):
             queryset = self.get_queryset().like_set.filter(user=self.request.user).first()
             queryset.delete()
             if 'post_id' in self.kwargs:
-                return Response(Post_Serializer(instance=self.get_queryset()),status=status.HTTP_200_OK)
+                return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
             elif 'comment_id' in self.kwargs:
-                return Response(Comment_Serializer(instance=self.get_queryset()),status=status.HTTP_200_OK)
+                return Response(Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
             elif 'reply_id' in self.kwargs:
-                return Response(Reply_Serializer(instance=self.get_queryset()),status=status.HTTP_200_OK)     
+                return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)     
         else:
             if 'post_id' in self.kwargs:
                 like = Like(user=self.request.user,
                             post=self.get_queryset())
                 like.save()
-                return Response(Post_Serializer(instance=self.get_queryset()),status=status.HTTP_200_OK)
+                return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
             elif 'comment_id' in self.kwargs:
                 like = Like(user=self.request.user,
                             comment=self.get_queryset())
                 like.save()
-                return Response(Comment_Serializer(instance=self.get_queryset()),status=status.HTTP_200_OK)
+                return Response(Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
             elif 'reply_id' in self.kwargs:
                 like = Like(user=self.request.user,
                             reply=self.get_queryset())
                 like.save()
-                return Response(Reply_Serializer(instance=self.get_queryset()),status=status.HTTP_200_OK)
+                return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
 
 class SaveList(mixins.ListModelMixin, generics.GenericAPIView):
     serializer_class = Like_Serializer
@@ -244,11 +244,11 @@ class SaveHandler(generics.GenericAPIView):
         if self.get_queryset().save_set.filter(user=self.request.user).exists():
             queryset = self.get_queryset().save_set.filter(user=self.request.user).first()
             queryset.delete()
-            return Response(Post_Serializer(instance=self.get_queryset()), status=status.HTTP_200_OK)     
+            return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data, status=status.HTTP_200_OK)     
         else:
             if 'post_id' in self.kwargs:
                 save = Save(user=self.request.user,
                             post=self.get_queryset())
                 save.save()
 
-            return Response(Post_Serializer(instance=self.get_queryset()), status=status.HTTP_200_OK)
+            return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data, status=status.HTTP_200_OK)
