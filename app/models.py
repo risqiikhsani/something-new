@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from versatileimagefield.fields import VersatileImageField
 
-
+from django.contrib.humanize.templatetags import humanize
 class Post(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	text = models.TextField(blank=True, null=True)
@@ -22,6 +22,12 @@ class Post(models.Model):
 
 	def get_shares_amount(self):
 		return self.share_set.all().count()
+
+	def get_natural_time(self):
+		return humanize.naturaltime(self.time_creation)
+
+	def get_natural_day(self):
+		return humanize.naturalday(self.time_creation)
 
 
 class Save(models.Model):
@@ -55,6 +61,12 @@ class Comment(models.Model):
 	def get_replies_amount(self):
 		return self.reply_set.all().count()
 
+	def get_natural_time(self):
+		return humanize.naturaltime(self.time_creation)
+
+	def get_natural_day(self):
+		return humanize.naturalday(self.time_creation)
+
 class Reply(models.Model):
 	comment = models.ForeignKey(Comment,on_delete=models.CASCADE)
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -66,6 +78,12 @@ class Reply(models.Model):
 
 	def get_likes_amount(self):
 		return self.like_set.all().count()
+
+	def get_natural_time(self):
+		return humanize.naturaltime(self.time_creation)
+
+	def get_natural_day(self):
+		return humanize.naturalday(self.time_creation)
 
 class Report(models.Model):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)

@@ -14,13 +14,15 @@ class Post_Serializer(serializers.ModelSerializer):
     likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
     comments_amount = serializers.IntegerField(source="get_comments_amount",required=False)
     shares_amount = serializers.IntegerField(source="get_shares_amount",required=False)
+    natural_time = serializers.CharField(source="get_natural_time",required=False)
+    natural_day = serializers.CharField(source="get_natural_day",required=False)
     liked = serializers.SerializerMethodField()
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'user', 'text', 'time_creation',
+        fields = ['id', 'user', 'text', 'time_creation','natural_time','natural_day',
             'likes_amount', 'comments_amount','shares_amount','liked','shared','saved']
         read_only_fields = ['user',]
 
@@ -58,10 +60,12 @@ class Comment_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
     likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
     replies_amount = serializers.IntegerField(source="get_replies_amount",required=False)
+    natural_time = serializers.CharField(source="get_natural_time",required=False)
+    natural_day = serializers.CharField(source="get_natural_day",required=False)
     liked = serializers.SerializerMethodField()
     class Meta:
         model = Comment
-        fields = ['post','user','text','time_creation','likes_amount','replies_amount','liked']
+        fields = ['id','post','user','text','time_creation','natural_time','natural_day','likes_amount','replies_amount','liked']
         read_only_fields = ['user', 'post']
 
     def get_liked(self,obj):
@@ -77,10 +81,12 @@ class Comment_Serializer(serializers.ModelSerializer):
 class Reply_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
     likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
+    natural_time = serializers.CharField(source="get_natural_time",required=False)
+    natural_day = serializers.CharField(source="get_natural_day",required=False)
     liked = serializers.SerializerMethodField()
     class Meta:
         model = Reply
-        fields = ['comment','user','text','time_creation','likes_amount','liked']
+        fields = ['id','comment','user','text','time_creation','natural_time','natural_day','likes_amount','liked']
         read_only_fields = ['user', 'comment']
 
     def get_liked(self,obj):
