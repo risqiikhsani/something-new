@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Post, Save, Share, Comment, Reply, Report, Like
+from .models import Post, PostMedia ,Save, Share, Comment, Reply, Report, Like
 
 
 @admin.register(Post)
@@ -8,6 +8,10 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'text', 'time_creation')
     list_filter = ('user', 'time_creation')
 
+@admin.register(PostMedia)
+class PostMediaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'post', 'image', 'time_creation')
+    list_filter = ('post', 'time_creation')
 
 @admin.register(Save)
 class SaveAdmin(admin.ModelAdmin):

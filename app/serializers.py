@@ -8,7 +8,20 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from user.serializers import User_Serializer
 
-
+from versatileimagefield.serializers import VersatileImageFieldSerializer
+class PostMedia_Serializer(serializers.ModelSerializer):
+    image = VersatileImageFieldSerializer(
+        sizes=[
+            ('full_size', 'url'),
+            ('thumbnail', 'thumbnail__100x100'),
+            ('medium_square_crop', 'crop__400x400'),
+            ('small_square_crop', 'crop__50x50')
+        ]
+    )
+    class Meta:
+        model = PostMedia
+        fields = ['id','post','image','time_creation']
+        read_only_fields = ['post']
 class Post_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
     likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
@@ -19,12 +32,13 @@ class Post_Serializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField()
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
+    postmedia_set = PostMedia_Serializer(many=True,required=False)
 
     class Meta:
         model = Post
         fields = ['id', 'user', 'text', 'time_creation','natural_time','natural_day',
-            'likes_amount', 'comments_amount','shares_amount','liked','shared','saved']
-        read_only_fields = ['user',]
+            'likes_amount', 'comments_amount','shares_amount','liked','shared','saved','postmedia_set']
+        read_only_fields = ['user','postmedia_set']
 
     def get_liked(self,obj):
         # will work even no authenticated user
@@ -50,6 +64,16 @@ class Post_Serializer(serializers.ModelSerializer):
             return True
         else:
             return False
+
+    def create(self,validated_data):
+        for i in validated_data:
+            print(i)
+
+        for i in self.context['request'].FILES.values():
+            print(i)
+
+        a = Post.objects.create(**validated_data)
+        return a
 
 
 

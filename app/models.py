@@ -11,6 +11,7 @@ class Post(models.Model):
 	text = models.TextField(blank=True, null=True)
 	time_creation = models.DateTimeField(auto_now_add=True,null=True)
 
+
 	def __str__(self):
 		return str(self.id)
 
@@ -28,6 +29,22 @@ class Post(models.Model):
 
 	def get_natural_day(self):
 		return humanize.naturalday(self.time_creation)
+
+
+from .helpers import get_random_alphanumeric_string
+def get_upload_path(instance,filename):
+	ext = filename.split('.')[-1]
+	randomfilename = get_random_alphanumeric_string(20)
+	resultfilename = "%s.%s" % (randomfilename, ext)
+	return 'user/{}/post/{}/{}'.format(instance.post.user.id,instance.post.id,resultfilename)
+
+class PostMedia(models.Model):
+	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+	image = VersatileImageField(blank=True,null=True,upload_to=get_upload_path)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+	
+	def __str__(self):
+		return str(self.id)
 
 
 class Save(models.Model):
