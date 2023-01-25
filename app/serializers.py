@@ -16,7 +16,7 @@ class PostMedia_Serializer(serializers.ModelSerializer):
             ('thumbnail', 'thumbnail__100x100'),
             ('medium_square_crop', 'crop__400x400'),
             ('small_square_crop', 'crop__50x50')
-        ]
+        ],
     )
     class Meta:
         model = PostMedia
@@ -33,12 +33,16 @@ class Post_Serializer(serializers.ModelSerializer):
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
     postmedia_set = PostMedia_Serializer(many=True,required=False)
-
+    delete_images_id = serializers.ListField(required=False,write_only=True,child=serializers.IntegerField())
     class Meta:
         model = Post
         fields = ['id', 'user', 'text', 'time_creation','natural_time','natural_day',
-            'likes_amount', 'comments_amount','shares_amount','liked','shared','saved','postmedia_set']
+            'likes_amount', 'comments_amount','shares_amount','liked','shared','saved','postmedia_set','delete_images_id']
         read_only_fields = ['user','postmedia_set']
+        # extra_kwargs = [
+        #     'deleted_images_id':{'write_only':True}, 
+        # ]
+
 
     def get_liked(self,obj):
         # will work even no authenticated user
@@ -71,10 +75,42 @@ class Post_Serializer(serializers.ModelSerializer):
 
         for i in self.context['request'].FILES.values():
             print(i)
+            print(i.size)
 
         a = Post.objects.create(**validated_data)
+        for i in self.context['request'].FILES.values():
+            b = PostMedia.objects.create(post=a,image=i)
+            b.save()
         return a
+    
+    def validate(self,data):
+        limit = 8 * 1024 * 1024
+        totalsize = 0
+        for i in self.context['request'].FILES.values():
+            print(i)
+            print(i.size)
+            totalsize = totalsize + i.size
+        if totalsize > limit:
+            raise serializers.ValidationError({'File too large. Total file Size should not exceed 8 MiB.'})
+        return data
 
+    def update(self,instance,validated_data):
+        instance.text = validated_data.get('text',instance.text)
+        for i in self.context['request'].FILES.values():
+            b = PostMedia.objects.create(post=instance,image=i)
+            b.save()
+        if "delete_images_id" in validated_data:
+            print("delete_images_id in validated data = true")
+            for a in validated_data.get('delete_images_id'):
+                print("coba")
+                print(a)
+                try:
+                    z = PostMedia.objects.get(id=a)
+                    z.delete()
+                except PostMedia.DoesNotExist:
+                    pass
+        instance.save()
+        return instance
 
 
 
