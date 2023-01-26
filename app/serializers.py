@@ -33,7 +33,7 @@ class Post_Serializer(serializers.ModelSerializer):
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
     postmedia_set = PostMedia_Serializer(many=True,required=False)
-    delete_images_id = serializers.ListField(required=False,write_only=True,child=serializers.IntegerField())
+    delete_images_id = serializers.ListField(required=False,child=serializers.IntegerField(),write_only=True,allow_empty=True, min_length=None, max_length=None)
     class Meta:
         model = Post
         fields = ['id', 'user', 'text', 'time_creation','natural_time','natural_day',
@@ -101,7 +101,7 @@ class Post_Serializer(serializers.ModelSerializer):
             b.save()
         if "delete_images_id" in validated_data:
             print("delete_images_id in validated data = true")
-            for a in validated_data.get('delete_images_id'):
+            for a in list(validated_data["delete_images_id"]):
                 print("coba")
                 print(a)
                 try:
