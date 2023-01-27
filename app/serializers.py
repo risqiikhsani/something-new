@@ -8,7 +8,6 @@ from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from user.serializers import User_Serializer
 
-from versatileimagefield.serializers import VersatileImageFieldSerializer
 class PostMedia_Serializer(serializers.ModelSerializer):
     image = VersatileImageFieldSerializer(
         sizes=[

@@ -30,12 +30,81 @@ class Profile_Simple_Serializer(serializers.ModelSerializer):
 		model = Profile
 		fields = ['name','public_username','profile_picture','poster_picture']
 
-class User_Serializer(serializers.ModelSerializer):
+class User_Simple_Serializer(serializers.ModelSerializer):
 	profile = Profile_Simple_Serializer()
 	
 	class Meta:
 		model = CustomUser
 		fields = ['id','profile']
+
+
+class Profile_Serializer(serializers.ModelSerializer):
+	profile_picture = VersatileImageFieldSerializer(
+		sizes=[
+			('full_size', 'url'),
+            ('small', 'thumbnail__200x200'),
+            ('medium', 'thumbnail__400x400'),
+		]
+	)
+	poster_picture = VersatileImageFieldSerializer(
+		sizes=[
+			('full_size', 'url'),
+            ('small', 'thumbnail__200x200'),
+            ('medium', 'thumbnail__400x400'),
+		]
+	)
+	class Meta:
+		model = Profile
+		fields = ['name','public_username','about','profile_picture','poster_picture']
+
+class User_Serializer(serializers.ModelSerializer):
+	profile = Profile_Serializer()
+	connections_amount = serializers.IntegerField(source="get_connections_amount",required=False,read_only=True)
+	class Meta:
+		model = CustomUser
+		fields = ['id',
+			'last_login',
+			'is_superuser',
+			'is_staff',
+			'is_active',
+			'date_joined',
+			'groups',
+			'user_permissions',
+			'profile',
+			'connections_amount'
+			]
+
+class my_user_serializer(serializers.ModelSerializer):
+	class Meta:
+		model = CustomUser
+		# fields = '__all__'
+		exclude = ('password',)
+		read_only_fields = ['username','is_superuser','is_staff','is_active','date_joined','groups','user_permissions','profile']
+
+class my_profile_serializer(serializers.ModelSerializer):
+	profile_picture = VersatileImageFieldSerializer(
+        sizes=[
+            ('full_size', 'url'),
+            ('thumbnail', 'thumbnail__100x100'),
+            ('medium_square_crop', 'crop__400x400'),
+            ('small_square_crop', 'crop__50x50')
+        ],
+		required=False,
+    )
+
+	poster_picture = VersatileImageFieldSerializer(
+        sizes=[
+            ('full_size', 'url'),
+            ('thumbnail', 'thumbnail__100x100'),
+            ('medium_square_crop', 'crop__400x400'),
+            ('small_square_crop', 'crop__50x50')
+        ],
+		required=False,
+    )
+	class Meta:
+		model = Profile
+		fields = '__all__'
+
 
 class Connection_Serializer(serializers.ModelSerializer):
 	user = User_Serializer()

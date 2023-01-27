@@ -1,8 +1,9 @@
 
 
-from .serializers import User_Serializer
+from .serializers import User_Serializer, User_Simple_Serializer
 from .serializers import Request_Serializer
 from .serializers import Connection_Serializer
+from .serializers import my_user_serializer,my_profile_serializer
 from django_filters.rest_framework import DjangoFilterBackend
 from http import server
 from os import stat
@@ -42,7 +43,7 @@ def api_root(request, format=None):
 
 
 class UserList(mixins.ListModelMixin, generics.GenericAPIView):
-	serializer_class = User_Serializer
+	serializer_class = User_Simple_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	queryset = User.objects.all()
 
@@ -50,12 +51,32 @@ class UserList(mixins.ListModelMixin, generics.GenericAPIView):
 		return self.list(request, *args, **kwargs)
 
 
-
-
 class UserDetail(generics.RetrieveAPIView):
 	queryset = User.objects.all()
 	serializer_class = User_Serializer
 	
+class my_user(generics.RetrieveUpdateAPIView):
+	parser_classes = (JSONParser, MultiPartParser, FormParser)
+	serializer_class = my_user_serializer
+	queryset = User.objects.all()
+
+	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
+	def get_object(self):
+		queryset = self.get_queryset()
+		obj = get_object_or_404(queryset, id=self.request.user.id)
+		return obj
+	
+	
+class my_profile(generics.RetrieveUpdateAPIView):
+	parser_classes = (JSONParser, MultiPartParser, FormParser)
+	serializer_class = my_profile_serializer
+	queryset = Profile.objects.all()
+	
+	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
+	def get_object(self):
+		queryset = self.get_queryset()
+		obj = get_object_or_404(queryset, user=self.request.user)
+		return obj
 
 class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 	serializer_class = Connection_Serializer

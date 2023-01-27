@@ -28,6 +28,9 @@ class CustomUser(AbstractUser):
 	def __str__(self):
 		return self.username
 	
+	def get_connections_amount(self):
+		return self.connection.connected.all().count()
+	
 
 from .helpers import get_random_alphanumeric_string
 def get_upload_path(instance,filename):
@@ -46,7 +49,7 @@ def file_size(value): # add this to some file where you can import it from
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 	name = models.CharField(max_length=100, blank=True, null=True)
-	public_username = models.CharField(max_length=100, null=True, blank=True)
+	public_username = models.CharField(max_length=100, null=True, blank=True,unique=True)
 
 	about = models.TextField(blank=True,null=True)
 	profile_picture = VersatileImageField(
@@ -73,6 +76,8 @@ class Connection(models.Model):
 	
 	def __str__(self):
 		return str(self.id)
+	
+
 
 class Block(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)

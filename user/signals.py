@@ -1,4 +1,5 @@
-from django.db.models.signals import post_save,m2m_changed,post_delete
+import os
+from django.db.models.signals import post_save,m2m_changed,post_delete,pre_save
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -131,3 +132,65 @@ def blockDeletedAction(sender,instance,*args,**kwargs):
 
 post_delete.connect(blockDeletedAction,sender=Block,dispatch_uid="unique")
 
+
+
+def auto_clear_files_on_delete(sender,instance,*args,**kwargs):
+    print("file handler signal is running")
+    # delete filtered and sized cache images
+    instance.profile_picture.delete_all_created_images()
+    instance.poster_picture.delete_all_created_images()
+    try:
+        # delete original image
+        instance.profile_picture.delete(save=False)
+    except:
+        pass
+
+    try:
+        # delete original image
+        instance.poster_picture.delete(save=False)
+    except:
+        pass
+
+
+post_delete.connect(auto_clear_files_on_delete,sender=Profile,dispatch_uid="unique")
+
+
+
+def auto_delete_file_on_change(sender,instance,**kwargs):
+    """
+    Deletes old file from filesystem
+    when corresponding `MediaFile` object is updated
+    with new file.
+    """
+    if not instance.pk:
+        return False
+
+    # handle update/delete profile_picture
+    try:
+        old_file = sender.objects.get(pk=instance.pk).profile_picture
+    except sender.DoesNotExist:
+        return False
+
+    new_file = instance.profile_picture
+    if not old_file == new_file:
+        if not old_file:
+            return False
+        if os.path.isfile(old_file.path):
+            os.remove(old_file.path)
+            old_file.delete_all_created_images()
+    # handle update/delete poster_picture
+    try:
+        old_file_b = sender.objects.get(pk=instance.pk).poster_picture
+    except sender.DoesNotExist:
+        return False
+
+    new_file_b = instance.poster_picture
+    if not old_file_b == new_file_b:
+        if not old_file_b:
+            return False
+        if os.path.isfile(old_file_b.path):
+            os.remove(old_file_b.path)
+            old_file_b.delete_all_created_images()
+
+
+pre_save.connect(auto_delete_file_on_change,sender=Profile,dispatch_uid="unique")

@@ -21,6 +21,8 @@ from .views import (
     ConnectionViewSet,
     RequestViewSet,
     UserViewSet,
+    my_user,
+    my_profile,
 )   
 
 
@@ -34,6 +36,9 @@ urlpatterns = [
     path('', api_root),
     path('user-list',UserList.as_view(), name='user-list'),
     path('user-detail/<int:pk>',UserDetail.as_view(), name="user-detail"),
+
+    path('my/user',my_user.as_view(), name='my-user'),
+    path('my/profile',my_profile.as_view(), name='my-profile'),
 
     # WORKS
     path('connections',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),
