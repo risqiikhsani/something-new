@@ -29,7 +29,19 @@ class CustomUser(AbstractUser):
 		return self.username
 	
 
+from .helpers import get_random_alphanumeric_string
+def get_upload_path(instance,filename):
+	ext = filename.split('.')[-1]
+	randomfilename = get_random_alphanumeric_string(20)
+	resultfilename = "%s.%s" % (randomfilename, ext)
+	return 'user/{}/profile/{}'.format(instance.user.id,resultfilename)
 
+from django.core.exceptions import ValidationError
+
+def file_size(value): # add this to some file where you can import it from
+    limit = 8 * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError('File too large. Size should not exceed 8 MiB.')
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
@@ -37,15 +49,16 @@ class Profile(models.Model):
 	public_username = models.CharField(max_length=100, null=True, blank=True)
 
 	about = models.TextField(blank=True,null=True)
-
 	profile_picture = VersatileImageField(
-		upload_to='images/profile_picture/',
+		upload_to=get_upload_path,
+		validators=[file_size],
 		null=True,
 		blank=True
 	)
 
 	poster_picture = VersatileImageField(
-		upload_to='images/poster_picture/',
+		upload_to=get_upload_path,
+		validators=[file_size],
 		null=True,
 		blank=True
 	)

@@ -33,7 +33,7 @@ urlpatterns = [
     path('change-password', ChangePassword.as_view(), name='change-password'),
     path('', api_root),
     path('user-list',UserList.as_view(), name='user-list'),
-    path('user-detail',UserDetail.as_view(), name="user-detail"),
+    path('user-detail/<int:pk>',UserDetail.as_view(), name="user-detail"),
 
     # WORKS
     path('connections',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),

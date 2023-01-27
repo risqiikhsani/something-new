@@ -50,16 +50,12 @@ class UserList(mixins.ListModelMixin, generics.GenericAPIView):
 		return self.list(request, *args, **kwargs)
 
 
-class UserDetail(mixins.RetrieveModelMixin,
-					mixins.UpdateModelMixin,
-					mixins.DestroyModelMixin,
-					generics.GenericAPIView):
+
+
+class UserDetail(generics.RetrieveAPIView):
 	queryset = User.objects.all()
 	serializer_class = User_Serializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-	def get(self, request, *args, **kwargs):
-		return self.retrieve(request, *args, **kwargs)
+	
 
 class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 	serializer_class = Connection_Serializer
