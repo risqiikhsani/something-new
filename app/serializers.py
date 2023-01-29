@@ -1,3 +1,5 @@
+import json
+from queue import Empty
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -21,6 +23,22 @@ class PostMedia_Serializer(serializers.ModelSerializer):
         model = PostMedia
         fields = ['id','post','image','time_creation']
         read_only_fields = ['post']
+
+class ListFieldWithSaneDefault(serializers.ListField):
+    """
+    This is used ONLY as a base class for other fields.  When using it, please ensure that you
+    always provide a default value (at least `default=lambda: []`) if the field is not required.
+    Your derived class should take no parameters to __init__, it should be self contained
+    """
+    def get_value(self, dictionary):
+        """
+        When handling html multipart forms input (as opposed to json, which works properly)
+        the base list field returns `[]` for _missing_ keys.  This override checks for that specific
+        case and returns `empty` so that standard default-value processing takes over
+        """
+        if self.field_name not in dictionary:
+            return Empty
+        return super(ListFieldWithSaneDefault, self).get_value(dictionary)
 class Post_Serializer(serializers.ModelSerializer):
     user = User_Serializer(required=False)
     likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
@@ -32,7 +50,9 @@ class Post_Serializer(serializers.ModelSerializer):
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
     postmedia_set = PostMedia_Serializer(many=True,required=False)
-    delete_images_id = serializers.ListField(required=False,child=serializers.IntegerField(),write_only=True,allow_empty=True, min_length=None, max_length=None)
+    # delete_images_id = serializers.ListField(required=False,child=serializers.IntegerField(),write_only=True,allow_empty=True, min_length=None, max_length=None)
+    delete_images_id = serializers.JSONField(required=False,write_only=True)
+
     class Meta:
         model = Post
         fields = ['id', 'user', 'text', 'time_creation','natural_time','natural_day',
@@ -99,9 +119,7 @@ class Post_Serializer(serializers.ModelSerializer):
             b = PostMedia.objects.create(post=instance,image=i)
             b.save()
         if "delete_images_id" in validated_data:
-            print("delete_images_id in validated data = true")
-            for a in list(validated_data["delete_images_id"]):
-                print("coba")
+            for a in validated_data['delete_images_id']:
                 print(a)
                 try:
                     z = PostMedia.objects.get(id=a)
