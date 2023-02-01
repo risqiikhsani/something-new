@@ -37,6 +37,8 @@ class Register(generics.GenericAPIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 from .serializers_auth import Login_Serializer
+from .serializers_auth import User_Simple_Serializer
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 class Login(generics.GenericAPIView):
 	permission_classes = [permissions.AllowAny, ]
 	serializer_class = Login_Serializer
@@ -56,8 +58,7 @@ class Login(generics.GenericAPIView):
 			refresh = self.get_tokens_for_user(user)
 
 			data = {
-				'id':str(user.id),
-				'name':str(user.profile.name),
+				'user':User_Simple_Serializer(instance=user).data,
 				'refresh_token':str(refresh),
 				'access_token':str(refresh.access_token),
 			}
