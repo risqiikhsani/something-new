@@ -105,24 +105,32 @@ class my_profile_serializer(serializers.ModelSerializer):
 		model = Profile
 		fields = '__all__'
 
-
-class Connection_Serializer(serializers.ModelSerializer):
-	user = User_Serializer()
-	class Meta:
-		model = Connection
-		fields = ['id','user']
-
-class Request_Serializer(serializers.ModelSerializer):
-	sender = User_Serializer()
-	class Meta:
-		model = Request
-		fields = '__all__'
-
 class Relationship_Serializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Relationship
+		exclude = ('user','to_user',)
+class Connection_Serializer(serializers.ModelSerializer):
+	user = User_Simple_Serializer()
+	relationship = serializers.SerializerMethodField()
+	class Meta:
+		model = Connection
+		fields = ['id','user','relationship']
+
+	def get_relationship(self,obj):
+		try:
+			a = Relationship.objects.get(user=self.context['request'].user,to_user=obj.user)
+		except Relationship.DoesNotExist:
+			return None
+		return Relationship_Serializer(instance=a).data
+
+class Request_Serializer(serializers.ModelSerializer):
+	sender = User_Simple_Serializer()
+	class Meta:
+		model = Request
 		fields = '__all__'
+
+
 
 class Block_Serializer(serializers.ModelSerializer):
 	class Meta:
