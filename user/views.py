@@ -30,6 +30,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+from something.pagination import MycustomPagination
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -78,7 +79,11 @@ class my_profile(generics.RetrieveUpdateAPIView):
 		obj = get_object_or_404(queryset, user=self.request.user)
 		return obj
 
+
+ 
 class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
+# https://stackoverflow.com/questions/31785966/django-rest-framework-turn-on-pagination-on-a-viewset-like-modelviewset-pagina
+# class ConnectionViewSet(mixins.ListModelMixin,viewsets.GenericViewSet):
 	serializer_class = Connection_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 	queryset = Connection.objects.all()
@@ -106,7 +111,7 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
 
 	def get_queryset(self):
-		return Request.objects.all()
+		return Request.objects.all().order_by('-time_creation')
 
 	def list(self,request):
 		queryset = self.get_queryset()

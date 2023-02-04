@@ -58,7 +58,7 @@ class Login(generics.GenericAPIView):
 			refresh = self.get_tokens_for_user(user)
 
 			data = {
-				'user':User_Simple_Serializer(instance=user).data,
+				'user':User_Simple_Serializer(instance=user,context={'request':request}).data,
 				'refresh_token':str(refresh),
 				'access_token':str(refresh.access_token),
 			}
