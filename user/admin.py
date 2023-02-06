@@ -149,6 +149,7 @@ class RelationshipAdmin(admin.ModelAdmin):
         'follow',
         'notification',
         'nickname',
+		'time_creation',
     )
     list_filter = ('user', 'to_user', 'pin', 'follow', 'notification')
 

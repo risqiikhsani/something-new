@@ -115,8 +115,12 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 
 	def list(self,request):
 		queryset = self.get_queryset()
-		my_request_list = get_list_or_404(queryset, user=self.request.user)
-		serializer = self.get_serializer(my_request_list, many=True)
+		serializer = self.get_serializer(queryset.filter(user=self.request.user), many=True)
+		return Response(serializer.data)
+
+	def waiting_requests(self,request):
+		queryset = self.get_queryset()
+		serializer = self.get_serializer(queryset.filter(sender=self.request.user), many=True)
 		return Response(serializer.data)
 
 

@@ -93,6 +93,7 @@ class Relationship(models.Model):
 	follow = models.BooleanField(default=True)
 	notification = models.BooleanField(default=False)
 	nickname = models.CharField(max_length=100,null=True,blank=True)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True,blank=True)
 
 	def __str__(self):
 		return str(self.id)

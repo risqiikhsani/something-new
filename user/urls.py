@@ -50,6 +50,8 @@ urlpatterns = [
     # WORKS
     path('requests',RequestViewSet.as_view({'get':'list'}), name='request-list'),
     # WORKS
+    path('waiting-requests',RequestViewSet.as_view({'get':'waiting_requests'}), name='waiting-request-list'),
+    # WORKS
     path('user/<int:pk>/send_request',UserViewSet.as_view({'get':'send_request'}),name='send-request'),
     # WORKS
     path('user/<int:pk>/cancel_sent_request',UserViewSet.as_view({'get':'cancel_sent_request'}),name='cancel-sent-request'),

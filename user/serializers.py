@@ -110,6 +110,7 @@ class Relationship_Serializer(serializers.ModelSerializer):
 	class Meta:
 		model = Relationship
 		exclude = ('user','to_user',)
+		
 class Connection_Serializer(serializers.ModelSerializer):
 	user = User_Simple_Serializer()
 	relationship = serializers.SerializerMethodField()

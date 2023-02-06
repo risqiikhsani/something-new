@@ -46,9 +46,11 @@ post_save.connect(userMainSignal,sender=User,dispatch_uid="unique")
 def requestAction(sender,instance,created,**kwargs):
     print("signal : requestAction")
     # TESTED = WORKS !
-    # if user accept the friend request , user will be friend/connected with the request sender
+    # if user accept the friend request , user will be friend/connected with the request sender.
+    # then the request will be deleted
     if instance.accept == True:
         instance.user.connection.connected.add(instance.sender.connection)
+        instance.delete()
 
     # TESTED = WORKS !
     # if user decline the friend request , request will be deleted
