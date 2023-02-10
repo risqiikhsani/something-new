@@ -23,6 +23,7 @@ from .views import (
     UserViewSet,
     my_user,
     my_profile,
+    user_relationship,
 )   
 
 
@@ -44,8 +45,13 @@ urlpatterns = [
     path('connections',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),
     # WORKS
     path('user/<int:pk>/connections',UserViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
+    # WORKS (get,put)
+    path('user/<int:pk>/relationship',user_relationship.as_view(), name='user-relationship'),
     # WORKS
-    path('connections/<int:pk>/remove',ConnectionViewSet.as_view({'get':'remove_connection'}), name='connection-detail-remove'),
+    #path('connections/<int:pk>/remove',ConnectionViewSet.as_view({'get':'remove_connection'}), name='connection-detail-remove'),
+
+    path('user/<int:pk>/remove_connection',UserViewSet.as_view({'get':'remove_connection'}), name='connection-remove'),
+
 
     # WORKS
     path('requests',RequestViewSet.as_view({'get':'list'}), name='request-list'),

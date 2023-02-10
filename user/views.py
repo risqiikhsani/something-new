@@ -4,6 +4,7 @@ from .serializers import User_Serializer, User_Simple_Serializer
 from .serializers import Request_Serializer
 from .serializers import Connection_Serializer
 from .serializers import my_user_serializer,my_profile_serializer
+from .serializers import Relationship_Serializer
 from django_filters.rest_framework import DjangoFilterBackend
 from http import server
 from os import stat
@@ -55,11 +56,25 @@ class UserList(mixins.ListModelMixin, generics.GenericAPIView):
 class UserDetail(generics.RetrieveAPIView):
 	queryset = User.objects.all()
 	serializer_class = User_Serializer
+
+class user_relationship(generics.RetrieveUpdateAPIView):
+	parser_classes = (JSONParser, MultiPartParser, FormParser)
+	serializer_class = Relationship_Serializer
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+	queryset = Relationship.objects.all()
+
+	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
+	def get_object(self):
+		queryset = self.get_queryset().filter(user=self.request.user)
+		obj = get_object_or_404(queryset, to_user=User.objects.get(id=self.kwargs["pk"]))
+		return obj
 	
 class my_user(generics.RetrieveUpdateAPIView):
 	parser_classes = (JSONParser, MultiPartParser, FormParser)
 	serializer_class = my_user_serializer
 	queryset = User.objects.all()
+
+
 
 	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
 	def get_object(self):
@@ -151,6 +166,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 		return User.objects.all()
 
 	@action(detail=True)
+	def remove_connection(self,request,pk=None):
+		user = get_object_or_404(User,pk=pk)
+		my_c = get_object_or_404(Connection,user=self.request.user)
+		their_c = get_object_or_404(Connection,user=user)
+		if their_c in my_c.connected.all():
+			my_c.connected.remove(their_c)
+			return Response("request has been sent",status=status.HTTP_201_CREATED)
+		else:
+			return Response("failed, user wasn't connected",status=status.HTTP_404_NOT_FOUND)
+
+	@action(detail=True)
 	def send_request(self,request,pk=None):
 		user = get_object_or_404(User, pk=pk)
 		obj, created = Request.objects.get_or_create(user=user, sender=self.request.user )
@@ -171,7 +197,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 		user = get_object_or_404(User, pk=pk)
 		obj = user.connection.connected.all()
 		print(obj)
-		serializer = Connection_Serializer(obj,many=True)
+		serializer = Connection_Serializer(obj,many=True,context={'request': request})
 		return Response(serializer.data)
 	
 
