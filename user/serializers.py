@@ -101,6 +101,8 @@ class User_Serializer(serializers.ModelSerializer):
 			return False
 
 	def get_relationship(self,obj):
+		if self.context['request'].user.id == None:
+			return None
 		try:
 			a = Relationship.objects.get(user=self.context['request'].user,to_user=obj)
 		except Relationship.DoesNotExist:
