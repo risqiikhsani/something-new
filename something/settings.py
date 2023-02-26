@@ -41,6 +41,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'somethingnew-testing.herokuapp.com',
     '127.0.0.1',
+    'localhost', #set for websocket from reactjs ?
 ]
 
 # https://pypi.org/project/django-cors-headers/2.5.0/
@@ -52,6 +53,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    
+    'daphne',
+    'realtime',
     'app',
     'user',
     'rest_framework',
@@ -130,7 +134,15 @@ TEMPLATES = [
     },
 ]
 
-
+ASGI_APPLICATION = 'something.asgi.application'
+CHANNEL_LAYERS = {
+    "default":{
+        "BACKEND":"channels_redis.core.RedisChannelLayer",
+        "CONFIG":{
+            "hosts":[("127.0.0.1",6379)],   # currently using docker
+        },
+    },
+}
 WSGI_APPLICATION = 'something.wsgi.application'
 
 
