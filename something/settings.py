@@ -53,8 +53,14 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
-    
-    'daphne',
+    'channels', ## this will use ASGI version 3
+
+
+    # 'daphne', ## this will use ASGI version 4
+    # in order to use 'daphne' intead of 'channels' , reinstall the latest pip channels_redis version
+    # but there's gonna be some error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
+
+
     'realtime',
     'app',
     'user',
@@ -138,6 +144,9 @@ ASGI_APPLICATION = 'something.asgi.application'
 CHANNEL_LAYERS = {
     "default":{
         "BACKEND":"channels_redis.core.RedisChannelLayer",
+        # https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
+        # "BACKEND":"channels_redis.pubsub.RedisPubSubChannelLayer",
+        # solved by downgrading channels_redis version to 3.3.1
         "CONFIG":{
             "hosts":[("127.0.0.1",6379)],   # currently using docker
         },

@@ -39,6 +39,16 @@ class NotificationConsumer(WebsocketConsumer):
 
         user = self.scope["user"]
 
+        self.room_group_name = "notification_%s" % user.id
+
+        
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name, self.channel_name
+        )
+
+        Client.objects.create(user=user,channel_name=self.channel_name,server="app_notification")
+
+        print("connected = "+self.channel_name)
 
         self.accept()
 
@@ -47,24 +57,27 @@ class NotificationConsumer(WebsocketConsumer):
         # async_to_sync(self.channel_layer.group_discard)(
         #     self.room_group_name, self.channel_name
         # )
-        pass
-
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        text = text_data_json["text"]
-        # Send message to room group
-        async_to_sync(self.channel_layer.send)(
-            self.channel_name, {
-                "type": "send_notification",
-                "text": "helo",
-            }
+        Client.objects.filter(channel_name=self.channel_name).delete()
+        
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name, self.channel_name
         )
 
+    # def receive(self, text_data):
+    #     print('receive')
+    #     text_data_json = json.loads(text_data)
+    #     text = text_data_json["text"]
+    #     # Send message to room group
+    #     async_to_sync(self.channel_layer.send)(
+    #         self.channel_name, {
+    #             "type": "send_notification",
+    #             "text": "helo",
+    #         }
+    #     )
+
     def send_notification(self, event):
-        self.send(text_data=json.dumps({
-            "text": event["text"],
-            "type": "app_notification",
-        }))
+        print("send_notification event is running")
+        self.send(text_data=event["text"])
 
 
 class ChatConsumer(WebsocketConsumer):

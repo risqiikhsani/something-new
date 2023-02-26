@@ -1,0 +1,18 @@
+some ASGI error
+
+make sure run the docker redis instance
+sudo docker run -p 6379:6379 -d redis:5
+
+make sure use the current requirements.txt in new host
+
+error attr
+    solved by downgrading twisted version to 21.2.0
+
+error reactjs can't connect ws
+    solved by include 'localhost' in ALLOWED_HOSTS in settings
+
+error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
+    solved by downgrading the channels_redis to 3.3.1
+    and replace 'daphne' with 'channels' in APP settings
+    'daphne' will use latest ASGI
+    'channels' will use ASGI version 3

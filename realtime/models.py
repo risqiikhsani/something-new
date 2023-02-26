@@ -10,7 +10,7 @@ from versatileimagefield.fields import VersatileImageField
 
 class Client(models.Model):
     SERVER_CHOICES = [
-        ("app_notification","notification"),
+        ("app_notification","app_notification"),
         ("chat_notification","chat_notification"),
     ]
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
