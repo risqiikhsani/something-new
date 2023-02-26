@@ -33,15 +33,14 @@ class NotificationConsumer(WebsocketConsumer):
         # self.room_group_name = "chat_%s" % self.room_name
 
         # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name, self.channel_name
-        )
+        # async_to_sync(self.channel_layer.group_add)(
+        #     self.room_group_name, self.channel_name
+        # )
 
         user = self.scope["user"]
-        print("user is = "+user)
-        
 
-        # self.accept()
+
+        self.accept()
 
     def disconnect(self, close_code):
         # # Leave room group
@@ -49,23 +48,24 @@ class NotificationConsumer(WebsocketConsumer):
         #     self.room_group_name, self.channel_name
         # )
         pass
-    
+
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         text = text_data_json["text"]
         # Send message to room group
         async_to_sync(self.channel_layer.send)(
             self.channel_name, {
-            "type": "send_notification", 
-            "text": "helo",
+                "type": "send_notification",
+                "text": "helo",
             }
         )
 
-    def send_notification(self,event):
+    def send_notification(self, event):
         self.send(text_data=json.dumps({
-            "text":event["text"],
-            "type":"app_notification",
+            "text": event["text"],
+            "type": "app_notification",
         }))
+
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -92,19 +92,16 @@ class ChatConsumer(WebsocketConsumer):
         print("received text_data = " + text_data+" in "+self.channel_name)
         text_data_json = json.loads(text_data)
 
-
         message = text_data_json["message"]
         sender = text_data_json["sender"]
         command = text_data_json["command"]
 
-        
-
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {
-            "type": "chat_message", 
-            "message": message,
-            "sender": sender,
+                "type": "chat_message",
+                "message": message,
+                "sender": sender,
             }
         )
 
@@ -119,7 +116,7 @@ class ChatConsumer(WebsocketConsumer):
             "message": message,
             "type": "chat_text",
             "sender": sender,
-            }))
+        }))
 
 ####################################################################################################
 
