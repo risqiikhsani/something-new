@@ -1,6 +1,23 @@
 from django.contrib import admin
 
-from .models import ChatRoom, GroupChatRoom, Chat, Client
+from .models import *
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'event',
+        'sender_id',
+        'subject_data',
+        'subject_id',
+        'subject_text_preview',
+        'object_data',
+        'object_id',
+        'object_text_preview',
+        'time_creation',
+    )
+    list_filter = ('user', 'time_creation')
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):

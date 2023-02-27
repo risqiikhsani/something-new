@@ -10,6 +10,7 @@ import json
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+from realtime.models import *
 
 # https://techincent.com/how-to-delete-file-when-models-instance-is-delete-or-update-in-django/
 # or
@@ -50,46 +51,127 @@ def LikeNotification(sender, instance, created, **kwargs):
     channel_layer = get_channel_layer()
     print("like notification signal")
     user = None
-    obj = None
     event = None
+    obj_data = None
+    obj = None
     if instance.post:
         user = instance.post.user
-        obj = instance.post.id
         event = "liked_post"
+        obj_data = "post"
+        obj = instance.post
     elif instance.comment:
         user = instance.comment.user
-        obj = instance.comment.id
         event = "liked_comment"
+        obj_data = "comment"
+        obj = instance.comment
     elif instance.reply:
         user = instance.reply.user
-        obj = instance.reply.id
         event = "liked_reply"
+        obj_data = "reply"
+        obj = instance.reply
     else:
         return None
 
     if created:
         print("like notification signal is running")
-        print(user)
-        # if user.client_set.all().filter(server="app_notification").exists():
-        #     for a in user.client_set.all().filter(server="app_notification"):
-        #         print(a.channel_name)
-        #         async_to_sync(channel_layer.send(str(a.channel_name), {
-        #             "type": "send_notification",
-        #             "text": {
-        #                 "event": str(event),
-        #                 "sender": str(instance.user.id),
-        #                 "object": str(obj)
-        #             },
-        #         }))
+        Notification.objects.create(
+            user=user,
+            event=str(event),
+            sender_id=instance.user.id,
+            subject_data = "like",
+            subject_id = instance.id,
+            object_data = str(obj_data),
+            object_id=obj.id,
+            object_text_preview=str(obj.text),
+        )
         group_name = "notification_%s" % user.id
         async_to_sync(channel_layer.group_send)(
             group_name,
             {
-                'type': 'send_notification',
-                "text": "hello"
+                'type': 'app_notification',
+                "data": {
+                    "event": str(event),
+                    "sender_id": instance.user.id,
+                    "sender_name":str(instance.user.profile.name),
+                    "subject_data":"like",
+                    "subject_id":instance.id,
+                    "object_data": str(obj_data),
+                    "object_id": obj.id,
+                },
             }
         )
-                
 
 
 post_save.connect(LikeNotification, sender=Like, dispatch_uid="unique")
+
+def CommentNotification(sender,instance,created,**kwargs):
+    channel_layer = get_channel_layer()
+    user = instance.post.user
+    event = "commented_post"
+    obj = instance.post
+    if created:
+        Notification.objects.create(
+            user=user,
+            event=str(event),
+            sender_id=instance.user.id,
+            subject_data = "comment",
+            subject_id = instance.id,
+            subject_text_preview=str(instance.text),
+            object_data = "post",
+            object_id=obj.id,
+            object_text_preview=str(obj.text),
+        )
+        group_name = "notification_%s" % user.id
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                'type': 'app_notification',
+                "data": {
+                    "event": str(event),
+                    "sender_id": instance.user.id,
+                    "sender_name":str(instance.user.profile.name),
+                    "subject_data":"comment",
+                    "subject_id":instance.id,
+                    "object_data":"post",
+                    "object_id": obj.id,
+                },
+            }
+        )
+
+post_save.connect(CommentNotification, sender=Comment, dispatch_uid="unique")
+
+def ReplyNotification(sender,instance,created,**kwargs):
+    channel_layer = get_channel_layer()
+    user = instance.comment.user
+    event = "replied_comment"
+    obj = instance.comment
+    if created:
+        Notification.objects.create(
+            user=user,
+            event=str(event),
+            sender_id=instance.user.id,
+            subject_data = "reply",
+            subject_id = instance.id,
+            subject_text_preview = str(instance.text),
+            object_data = "comment",
+            object_id=obj.id,
+            object_text_preview = str(obj.text),
+        )
+        group_name = "notification_%s" % user.id
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                'type': 'app_notification',
+                "data": {
+                    "event": str(event),
+                    "sender_id": instance.user.id,
+                    "sender_name":str(instance.user.profile.name),
+                    "subject_data":"reply",
+                    "subject_id":instance.id,
+                    "object_data":"comment",
+                    "object_id": obj.id,
+                },
+            }
+        )
+
+post_save.connect(ReplyNotification, sender=Reply, dispatch_uid="unique")

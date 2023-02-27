@@ -29,55 +29,42 @@ from .models import *
 
 class NotificationConsumer(WebsocketConsumer):
     def connect(self):
-        # self.room_name = self.scope["url_route"]["kwargs"]["room_id"]
-        # self.room_group_name = "chat_%s" % self.room_name
-
-        # Join room group
-        # async_to_sync(self.channel_layer.group_add)(
-        #     self.room_group_name, self.channel_name
-        # )
 
         user = self.scope["user"]
 
         self.room_group_name = "notification_%s" % user.id
-
-        
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
 
-        Client.objects.create(user=user,channel_name=self.channel_name,server="app_notification")
+        # Client.objects.create(user=user,channel_name=self.channel_name,server="app_notification")
 
         print("connected = "+self.channel_name)
 
         self.accept()
 
     def disconnect(self, close_code):
-        # # Leave room group
-        # async_to_sync(self.channel_layer.group_discard)(
-        #     self.room_group_name, self.channel_name
-        # )
-        Client.objects.filter(channel_name=self.channel_name).delete()
+        # Client.objects.filter(channel_name=self.channel_name).delete()
         
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
 
-    # def receive(self, text_data):
-    #     print('receive')
-    #     text_data_json = json.loads(text_data)
-    #     text = text_data_json["text"]
-    #     # Send message to room group
-    #     async_to_sync(self.channel_layer.send)(
-    #         self.channel_name, {
-    #             "type": "send_notification",
-    #             "text": "helo",
-    #         }
-    #     )
 
-    def send_notification(self, event):
+    def app_notification(self, event):
         print("send_notification event is running")
-        self.send(text_data=event["text"])
+        print(event["data"])
+        self.send(text_data=json.dumps({
+            "type":"app_notification",
+            "data":event["data"],
+        }))
+
+    def chat_notification(self, event):
+        print("send_notification event is running")
+        self.send(text_data=json.dumps({
+            "type":"chat_notification",
+            "data":event["data"],
+        }))
 
 
 class ChatConsumer(WebsocketConsumer):

@@ -6,6 +6,28 @@ from django.db import models
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from versatileimagefield.fields import VersatileImageField
+from django.contrib.humanize.templatetags import humanize
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,blank=True)
+    event = models.CharField(max_length=100,null=True,blank=True)
+    sender_id = models.IntegerField(null=True,blank=True)
+    subject_data = models.CharField(null=True,blank=True,max_length=100)
+    subject_id = models.IntegerField(null=True,blank=True)
+    subject_text_preview = models.TextField(null=True,blank=True)
+    object_data = models.CharField(null=True,blank=True,max_length=100)
+    object_id = models.IntegerField(null=True,blank=True)
+    object_text_preview = models.TextField(null=True,blank=True)
+    time_creation = models.DateTimeField(auto_now_add=True,blank=True,null=True)
+
+    def __str__(self):
+        return str(self.id)
+    
+    def get_natural_time(self):
+        return humanize.naturaltime(self.time_creation)
+
+    def get_natural_day(self):
+        return humanize.naturalday(self.time_creation)
 
 
 class Client(models.Model):

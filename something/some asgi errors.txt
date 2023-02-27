@@ -11,6 +11,11 @@ error attr
 error reactjs can't connect ws
     solved by include 'localhost' in ALLOWED_HOSTS in settings
 
+error can't channel layer event isn't called when using 'single channel concept' (without group)
+    solved by changing to 'group channel' instead of 'single channel'
+    need further investigation !
+    note = the Client database's channel_name will be useless if group channel is used
+
 error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
     solved by downgrading the channels_redis to 3.3.1
     and replace 'daphne' with 'channels' in APP settings

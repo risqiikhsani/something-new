@@ -128,3 +128,9 @@ class Like(models.Model):
 
 	def __str__(self):
 		return str(self.id)
+	
+	def get_natural_time(self):
+		return humanize.naturaltime(self.time_creation)
+
+	def get_natural_day(self):
+		return humanize.naturalday(self.time_creation)
