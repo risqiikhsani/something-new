@@ -42,7 +42,15 @@ class Client(models.Model):
     def __str__(self):
         return str(self.id)
     
+class ClientSocketData(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
+    last_read_id_in_server = models.IntegerField(default=0)
+    server_name = models.CharField(null=True,blank=True,max_length=300)
+    # unread_item_in_server = models.IntegerField(null=True,blank=True)
 
+    def __str__(self):
+        return str(self.id)
+    
 class ChatRoom(models.Model):
     TYPE_CHOICES = [
         ("twoperson","twoperson"),
@@ -55,12 +63,22 @@ class ChatRoom(models.Model):
     def __str__(self):
         return str(self.id)
     
+    @property
+    def get_last_chat_date(self):
+        try:
+            return self.chat_set.all().latest('id').time_creation
+        except Chat.DoesNotExist:
+            return self.time_creation
+
+
+    
 class GroupChatRoom(models.Model):
     time_creation = models.DateTimeField(auto_now_add=True,null=True)
     generated_link = models.CharField(null=True,blank=True,max_length=100)
 
     def __str__(self):
         return str(self.id)
+
 
 class Chat(models.Model):
     room = models.ManyToManyField(ChatRoom,blank=True)
@@ -73,3 +91,4 @@ class Chat(models.Model):
 
     def __str__(self):
         return str(self.id)
+    

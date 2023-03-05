@@ -1,0 +1,4 @@
+using APIView can't use page in list ?
+
+
+if there's no webname in url photo , check the request in serializer class

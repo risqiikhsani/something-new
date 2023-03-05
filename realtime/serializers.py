@@ -1,6 +1,6 @@
 import json
 from queue import Empty
-from django.contrib.auth.models import User
+
 from rest_framework import serializers
 
 from .models import *
@@ -8,7 +8,11 @@ from .models import *
 
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
-from user.serializers import User_Serializer
+from user.serializers import User_Simple_Serializer
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 
 
 
@@ -21,4 +25,36 @@ class Notification_Serializer(serializers.ModelSerializer):
 
     def get_sender(self,obj):
         sender = User.objects.get(id=obj.sender_id)
-        return User_Serializer(instance=sender).data
+        return User_Simple_Serializer(instance=sender,context={'request':self.context['request']}).data
+
+
+
+class Chat_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
+
+class ChatRoom_Serializer(serializers.ModelSerializer):
+    last_chat = serializers.SerializerMethodField()
+    display = serializers.SerializerMethodField()
+    class Meta:
+        model = ChatRoom
+        fields = ['id','type','time_creation','last_chat','display']
+        order_by = ['']
+
+    
+    def get_last_chat(self,obj):
+        try:
+            a = obj.chat_set.all().latest('id')
+            return Chat_Serializer(instance=a,context={'request':self.context['request']}).data
+        except Chat.DoesNotExist:
+            return None    
+        
+    def get_display(self,obj):
+        if obj.type == "group":
+            return None
+        else:
+            user = obj.user.all().exclude(id=self.context['request'].user.id).latest('id')
+            return User_Simple_Serializer(instance=user).data
+        

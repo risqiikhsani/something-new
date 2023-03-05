@@ -24,6 +24,10 @@ class ClientAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'channel_name', 'server')
     list_filter = ('user',)
 
+@admin.register(ClientSocketData)
+class ClientSocketDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'last_read_id_in_server', 'server_name')
+    list_filter = ('user',)
 
 
 @admin.register(ChatRoom)

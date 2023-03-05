@@ -72,7 +72,7 @@ def LikeNotification(sender, instance, created, **kwargs):
     else:
         return None
 
-    if created:
+    if created and user.id is not instance.user.id: 
         print("like notification signal is running")
         Notification.objects.create(
             user=user,
@@ -109,7 +109,7 @@ def CommentNotification(sender,instance,created,**kwargs):
     user = instance.post.user
     event = "commented_post"
     obj = instance.post
-    if created:
+    if created and user.id is not instance.user.id:
         Notification.objects.create(
             user=user,
             event=str(event),
@@ -145,7 +145,7 @@ def ReplyNotification(sender,instance,created,**kwargs):
     user = instance.comment.user
     event = "replied_comment"
     obj = instance.comment
-    if created:
+    if created and user.id is not instance.user.id:
         Notification.objects.create(
             user=user,
             event=str(event),
