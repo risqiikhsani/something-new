@@ -30,9 +30,11 @@ class Notification_Serializer(serializers.ModelSerializer):
 
 
 class Chat_Serializer(serializers.ModelSerializer):
+    sender = User_Simple_Serializer(required=False)
+    
     class Meta:
         model = Chat
-        fields = '__all__'
+        fields = ['id','sender','room','text','time_creation','time_update','reply_from','forwarded',]
 
 
 class ChatRoom_Serializer(serializers.ModelSerializer):

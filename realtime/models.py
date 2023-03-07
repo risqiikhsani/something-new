@@ -92,3 +92,7 @@ class Chat(models.Model):
     def __str__(self):
         return str(self.id)
     
+    def get_natural_time(self):
+        return humanize.naturaltime(self.time_creation)
+
+    
