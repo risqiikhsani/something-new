@@ -26,6 +26,8 @@ from channels.generic.websocket import WebsocketConsumer
 
 from .models import *
 
+from .serializers import *
+
 
 class NotificationConsumer(WebsocketConsumer):
     def connect(self):
@@ -158,21 +160,32 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     # Menerima message dari websocket , kemudian kirim ke group channel layer
+    
     def receive(self, text_data):
         print("received text_data = " + text_data+" in "+self.channel_name)
         text_data_json = json.loads(text_data)
-
 
         data = text_data_json["data"]
         command = text_data_json["command"]
 
         match command:
             case "chat":
+
+                user = self.scope["user"]
+                a = ChatRoom.objects.get(id=self.room_name)
+                b = Chat.objects.create(
+                    room=a,
+                    sender=user,
+                    text=data.text,
+                    reply_from=data.reply_from,
+                )
+                b.save()
+
                 # Send message to room group
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name, {
                         "type": "chat_message",
-                        "data": data,
+                        "data": Chat_Serializer(instance=b).data
                     }
                 )
             case _:
@@ -186,9 +199,22 @@ class ChatConsumer(WebsocketConsumer):
         data = event["data"]
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            "message": data,
-            "type": "chat_text",
+            "data": data,
+            "type": "chat_message_ws",
         }))
+
+    def chat_notification(self, event):
+
+        data = event["data"]
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            "data": data,
+            "type": "chat_notification_ws",
+        }))
+
+    
+
+    
 
 ####################################################################################################
 

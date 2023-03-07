@@ -38,6 +38,7 @@ class Chat_Serializer(serializers.ModelSerializer):
 class ChatRoom_Serializer(serializers.ModelSerializer):
     last_chat = serializers.SerializerMethodField()
     display = serializers.SerializerMethodField()
+    # websocket_group_name = serializers.SerializerMethodField()
     class Meta:
         model = ChatRoom
         fields = ['id','type','time_creation','last_chat','display']
@@ -56,5 +57,8 @@ class ChatRoom_Serializer(serializers.ModelSerializer):
             return None
         else:
             user = obj.user.all().exclude(id=self.context['request'].user.id).latest('id')
-            return User_Simple_Serializer(instance=user).data
+            return User_Simple_Serializer(instance=user,context={'request':self.context['request']}).data
+        
+    # def get_websocket_group_name(self,obj):
+    #     return "chatroom_%s" % obj.id
         
