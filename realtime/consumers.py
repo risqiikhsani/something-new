@@ -174,11 +174,16 @@ class ChatConsumer(WebsocketConsumer):
                 user = self.scope["user"]
                 a = ChatRoom.objects.get(id=self.room_name)
                 b = Chat.objects.create(
-                    room=a,
                     sender=user,
-                    text=data.text,
-                    reply_from=data.reply_from,
+                    text=data["text"],
                 )
+
+                b.room.add(a)
+
+                if "reply_from" in data:
+                    z = Chat.objects.get(id=data["reply_from"])
+                    b.reply_from = z
+
                 b.save()
 
                 # Send message to room group
