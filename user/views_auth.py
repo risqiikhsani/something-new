@@ -85,4 +85,30 @@ class ChangePassword(generics.GenericAPIView):
 			return Response("updated", status=status.HTTP_201_CREATED)
 		else:
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		
+class SendEmailVerification(generics.GenericAPIView):
+	permission_classes = [permissions.IsAuthenticated]
 
+	def get_queryset(self):
+		return get_object_or_404(User, id=self.request.user.id)
+
+	# send uuid to email by signal
+	def get(self,request,*args,**kwargs):
+		verification = Verification.objects.create(user=self.request.user)
+		verification.save()
+
+		return Response("verification sent", status=status.HTTP_201_CREATED)
+
+
+class EmailVerification(generics.GenericAPIView):
+	permission_classes = [permissions.AllowAny]
+
+	def get(self,request,*args,**kwargs):
+		uuid = self.kwargs["uuid"]
+		verification = get_object_or_404(Verification,uuid=uuid)
+		if verification.user.email_verified == False:
+			user = verification.user
+			user.email_verified = True
+			user.save()
+
+		return Response("email has been verified successfully", status=status.HTTP_201_CREATED)

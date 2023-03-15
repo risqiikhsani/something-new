@@ -54,13 +54,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'channels', ## this will use ASGI version 3
-
-
     # 'daphne', ## this will use ASGI version 4
     # in order to use 'daphne' intead of 'channels' , reinstall the latest pip channels_redis version
     # but there's gonna be some error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
-
-
     'realtime',
     'app',
     'user',
@@ -297,6 +293,24 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
         ('headshot_small', 'crop__150x175'),
     ]
 }
+
+EMAIL_USE_TLS = True
+
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST_USER = str(os.getenv('EMAIL_HOST_USER'))
+
+EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD'))
+
+EMAIL_PORT = 587
+
+# celery
+REDIS_HOST = 'localhost' 
+REDIS_PORT = '6379' 
+BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0' 
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600} 
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
 
 
 

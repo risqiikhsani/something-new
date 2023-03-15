@@ -12,6 +12,31 @@ from django.conf import settings
 
 from django.core.mail import send_mail
 
+from .tasks import *
+
+def verificationSignal(sender,instance,created,**kwargs):
+    if created:
+        # this is usually for changing email , require code verification sent to old email
+        if instance.code:
+            if instance.user.email:
+                pass
+        # this is for email verification account
+        if instance.uuid:
+            if not instance.user.email_verified:
+                if instance.user.email:
+                    print("sending email...")
+                    app_name = "Testing"
+                    name = instance.username
+                    verification_url = instance.uuid
+
+                    subject = f'Verification from {app_name} App'
+                    message = f'Hi {name} , visit this link to verify your email address. {verification_url}'
+                    email_from = settings.EMAIL_HOST_USER
+                    recepient_list = [instance.email,]
+                    send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
+
+post_save.connect(verificationSignal,sender=Verification,dispatch_uid="unique")
+
 def userMainSignal(sender,instance,created,**kwargs):
     if created:
         print("signal : create profile")
@@ -28,17 +53,32 @@ def userMainSignal(sender,instance,created,**kwargs):
             user=instance,
         )
 
-        
+        # if there's email
+        if instance.email:
+            #send email
+            print("sending email...")
+            send_welcome_email.delay(instance)
+            # app_name = "Testing"
+            # name = instance.username
+            # subject = f'Welcome to {app_name} App'
+            # message = f'Hi {name} ,thankyou for registering in {app_name}.'
+            # email_from = settings.EMAIL_HOST_USER
+            # recepient_list = [instance.email,]
+            # send_mail(subject,message,email_from,recepient_list)
 
-        #send email
-        # app_name = "Testing"
-        # name = "Bruh"
-        # subject = f'Welcome to {app_name} App'
-        # message = f'Hi {name} ,thankyou for registering in {app_name}.'
-        # email_from = settings.EMAIL_HOST_USER
-        # recepient_list = [instance.email,]
-        # send_mail(subject,message,email_from,recepient_list)
-
+    # https://stackoverflow.com/questions/7375875/django-post-save-signals-on-update
+    # do something when user updated their account
+    if not created:
+        if instance.email:
+            print("sending email...")
+            send_welcome_email.delay(instance)
+            # app_name = "Testing"
+            # name = instance.username
+            # subject = f'Welcome to {app_name} App'
+            # message = f'Hi {name} ,thankyou for registering in {app_name}.'
+            # email_from = settings.EMAIL_HOST_USER
+            # recepient_list = [instance.email,]
+            # send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
 
                 
 post_save.connect(userMainSignal,sender=User,dispatch_uid="unique")

@@ -1,6 +1,7 @@
 from typing_extensions import Required
 from django.db import models
 
+import uuid
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
@@ -17,11 +18,19 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
 
+class Verification(models.Model):
+	user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+	code = models.CharField(max_length=50,null=True,blank=True)
+	uuid = models.UUIDField(default=uuid.uuid4)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True,blank=True)
 
+	def __str__(self):
+		return str(self.id)
 
 
 class CustomUser(AbstractUser):
 	phone_number = PhoneNumberField(null=True,blank=True)
+	email_verified = models.BooleanField(default=False,null=True,blank=True)
 	first_name = None
 	last_name = None
 	
