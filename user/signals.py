@@ -55,9 +55,10 @@ def userMainSignal(sender,instance,created,**kwargs):
 
         # if there's email
         if instance.email:
+            pass
             #send email
-            print("sending email...")
-            send_welcome_email.delay(instance)
+            # print("sending email...")
+            # send_welcome_email.delay(instance)
             # app_name = "Testing"
             # name = instance.username
             # subject = f'Welcome to {app_name} App'
@@ -68,10 +69,10 @@ def userMainSignal(sender,instance,created,**kwargs):
 
     # https://stackoverflow.com/questions/7375875/django-post-save-signals-on-update
     # do something when user updated their account
-    if not created:
-        if instance.email:
-            print("sending email...")
-            send_welcome_email.delay(instance)
+    # if not created:
+    #     if instance.email:
+    #         print("sending email...")
+    #         send_welcome_email.delay(instance)
             # app_name = "Testing"
             # name = instance.username
             # subject = f'Welcome to {app_name} App'

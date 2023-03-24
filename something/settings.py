@@ -36,7 +36,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY =  str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv('DEBUG'))
+
+BASE_BACKEND_URL = str(os.getenv('BASE_BACKEND_URL'))
+BASE_FRONTEND_URL = str(os.getenv('BASE_FRONTEND_URL'))
+BASE_FRONTEND_LOGIN_URL = str(os.getenv('BASE_FRONTEND_LOGIN_URL'))
 
 ALLOWED_HOSTS = [
     'somethingnew-testing.herokuapp.com',
@@ -57,6 +61,17 @@ INSTALLED_APPS = [
     # 'daphne', ## this will use ASGI version 4
     # in order to use 'daphne' intead of 'channels' , reinstall the latest pip channels_redis version
     # but there's gonna be some error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
+    
+    # 'rest_framework.authtoken',
+    # 'dj_rest_auth',
+    # 'dj_rest_auth.registration',
+    # 'django.contrib.sites',    
+    # 'allauth',    
+    # 'allauth.account',    
+    # 'allauth.socialaccount',        
+    # 'allauth.socialaccount.providers.github',
+    # 'allauth.socialaccount.providers.google',
+
     'realtime',
     'app',
     'user',
@@ -74,6 +89,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
 ]
+
+#https://python.plainenglish.io/social-media-rest-authentication-so-easy-that-you-will-laugh-django-7bca6869f931
+SITE_ID=1
+
 
 AUTH_USER_MODEL = 'user.CustomUser'
 AUTHENTICATION_BACKENDS = [
@@ -311,6 +330,7 @@ BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600} 
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 
-
+GOOGLE_OAUTH2_CLIENT_ID = str(os.getenv('GOOGLE_OAUTH2_CLIENT_ID'))
+GOOGLE_OAUTH2_CLIENT_SECRET = str(os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET'))
 
 
