@@ -1,0 +1,17 @@
+1.  change settings to use sqlite database , or change POSTGRES=FALSE in .env
+2.  python manage.py dumpdata > data.json
+
+3.  change settings to use postgres database , or change POSTGRES=TRUE in .env
+4.  python manage.py migrate --run-syncdb
+
+5.  python manage.py shell
+
+>>> from django.contrib.contenttypes.models import ContentType
+>>> ContentType.objects.all().delete()
+>>> quit()
+
+6.  comment all codes in all signals.py
+
+7.  python manage.py loaddata data.json
+
+8.  uncomment all codes in all signals.py

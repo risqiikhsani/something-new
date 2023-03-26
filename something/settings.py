@@ -200,15 +200,30 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+POSTGRES = str(os.getenv('POSTGRES'))
+
 if DEBUG:
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+    if POSTGRES=="TRUE":
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': str(os.getenv('POSTGRES_DB_NAME')),
+                'USER': str(os.getenv('POSTGRES_DB_USER')),
+                'PASSWORD': str(os.getenv('POSTGRES_DB_PASSWORD')),
+                'HOST': str(os.getenv('POSTGRES_HOST')),
+                'PORT': str(os.getenv('POSTGRES_PORT')),
+            }
         }
-    }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+
 else:
     DATABASES = {
         "default": {

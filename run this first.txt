@@ -6,3 +6,7 @@ celery -A something.celery worker --loglevel=debug --concurrency=4
 to run redis 
 
 sudo docker run -p 6379:6379 -d redis:5
+
+if use posgres , run this 
+
+docker-compose up -d

@@ -7,4 +7,6 @@ sudo apt-get install libmagic1
 https://pypi.org/project/python-magic/
 
 
+linux can't pip install psycopg2 , pip install psycopg2-binary instead
+
 package of pscopg2 (linux should install the posgrest first)
