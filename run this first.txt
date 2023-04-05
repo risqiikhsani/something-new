@@ -1,12 +1,12 @@
 to run celery , run in project folder
 https://code.tutsplus.com/tutorials/using-celery-with-django-for-background-task-processing--cms-28732
-
 celery -A something.celery worker --loglevel=debug --concurrency=4
 
 to run redis 
-
 sudo docker run -p 6379:6379 -d redis:5
 
 if use posgres , run this 
-
 docker-compose up -d
+
+run django
+python manage.py runserver
