@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/',include('user.urls')),
     path('api/app/',include('app.urls')),
     path('api/realtime/',include('realtime.urls')),
+    path('api/marketplace/',include('marketplace.urls')),
 ]
 
 

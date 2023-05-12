@@ -6,7 +6,11 @@ to run redis
 sudo docker run -p 6379:6379 -d redis:5
 
 if use posgres , run this 
-docker-compose up -d
+sudo docker-compose up -d
+
+port 5432 is used? 
+systemctl status postgresql
+systemctl stop postgresql
 
 run django
 python manage.py runserver

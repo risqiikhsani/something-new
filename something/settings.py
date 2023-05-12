@@ -71,7 +71,8 @@ INSTALLED_APPS = [
     # 'allauth.socialaccount',        
     # 'allauth.socialaccount.providers.github',
     # 'allauth.socialaccount.providers.google',
-
+    'graphene_django',
+    'marketplace',
     'realtime',
     'app',
     'user',
@@ -114,6 +115,12 @@ REST_FRAMEWORK = {
     #     'django_filters.rest_framework.DjangoFilterBackend',
     # ],
 }
+
+# If we didn’t specify the target schema in the urls.ply, we can do so here using
+# GRAPHENE = {
+#     "SCHEMA": "marketplace.schema.schema"
+# }
+
 
 from datetime import timedelta
 SIMPLE_JWT = {
