@@ -23,6 +23,12 @@ services:
       - "80:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+  redis:
+      container_name: redis_container
+      image: redis:5
+      ports:
+        - '6379:6379'
+
 
 volumes:
   local_pgdata:
