@@ -1,5 +1,7 @@
 to run celery , run in project folder
 https://code.tutsplus.com/tutorials/using-celery-with-django-for-background-task-processing--cms-28732
+https://www.codingforentrepreneurs.com/blog/celery-redis-django/
+https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#using-celery-with-django
 celery -A something.celery worker --loglevel=debug --concurrency=4
 
 to run redis 
@@ -11,6 +13,8 @@ sudo docker-compose up -d
 port 5432 is used? 
 systemctl status postgresql
 systemctl stop postgresql
+or
+sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill
 
 run django
 python manage.py runserver
