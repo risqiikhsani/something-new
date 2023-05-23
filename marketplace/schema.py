@@ -19,7 +19,54 @@ class Query(graphene.ObjectType):
             return Category.objects.get(name=name)
         except Category.DoesNotExist:
             return None
-        
+
+class CreateCategory(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+
+    category = graphene.Field(CategoryType)
+
+    @classmethod
+    def mutate(cls,root,info,name):
+        a = Category(name=name)
+        a.save()
+        return CreateCategory(category=a)
+    
+class UpdateCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        name = graphene.String(required=True)
+
+    category = graphene.Field(CategoryType)
+
+    @classmethod
+    def mutate(cls,root,info,id,name):
+        a = Category.objects.get(id=id)
+        a.name = name
+        a.save()
+        return UpdateCategory(category=a)
+    
+class DeleteCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+
+    category = graphene.Field(CategoryType)
+
+    @classmethod
+    def mutate(cls,root,info,id):
+        a = Category.objects.get(id=id)
+        a.delete()
+        return
+    
+class Mutation(graphene.ObjectType):
+    create_category = CreateCategory.Field()
+    update_category = UpdateCategory.Field()
+    delete_category = DeleteCategory.Field()
+
+
+
+
+
 # class QuestionType(DjangoObjectType):
 #     class Meta:
 #         model = Question

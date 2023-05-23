@@ -2,6 +2,7 @@ to run celery , run in project folder
 https://code.tutsplus.com/tutorials/using-celery-with-django-for-background-task-processing--cms-28732
 https://www.codingforentrepreneurs.com/blog/celery-redis-django/
 https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#using-celery-with-django
+https://medium.com/@techWithAditya/building-scalable-applications-with-django-celery-and-rabbitmq-a-step-by-step-guide-fc58bccc8cad
 celery -A something.celery worker --loglevel=debug --concurrency=4
 
 to run redis 
@@ -18,3 +19,7 @@ sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill
 
 run django
 python manage.py runserver
+
+
+other links
+https://medium.com/@benjamin.pereto/microservices-with-django-events-with-publish-subscribe-9cad1c7aee39
