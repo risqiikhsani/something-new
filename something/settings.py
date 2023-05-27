@@ -217,8 +217,8 @@ if DEBUG:
             'default': {
                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
                 'NAME': str(os.getenv('POSTGRES_DB_NAME')),
-                'USER': str(os.getenv('POSTGRES_DB_USER')),
-                'PASSWORD': str(os.getenv('POSTGRES_DB_PASSWORD')),
+                'USER': str(os.getenv('POSTGRES_USER')),
+                'PASSWORD': str(os.getenv('POSTGRES_PASSWORD')),
                 'HOST': str(os.getenv('POSTGRES_HOST')),
                 'PORT': str(os.getenv('POSTGRES_PORT')),
             }

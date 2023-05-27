@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .schema import schema as schema_without_relay
 from .schema_v2 import schema as schema_with_relay
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 urlpatterns = [
     # ...

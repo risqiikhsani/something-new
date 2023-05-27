@@ -1,19 +1,19 @@
 version: '3.8'
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: 
-      - 'celery -A something.celery worker --loglevel=debug --concurrency=4'
-      - 'python manage.py runserver 0.0.0.0:8000'
-    ports:
-      - 8000:8000
-    volumes:
-      - .:/app
-    depends_on:
-      - db
-      - redis
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: 
+  #     - 'celery -A something.celery worker --loglevel=debug --concurrency=4'
+  #     - 'python manage.py runserver 0.0.0.0:8000'
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - .:/app
+  #   depends_on:
+  #     - db
+  #     - redis
   db:
     container_name: pg_container
     image: postgres

@@ -7,18 +7,43 @@ from .types import *
 from .models import *
 
 class Query(graphene.ObjectType):
+    all_categories = graphene.List(CategoryType)
+    get_category = graphene.Field(CategoryType,id=graphene.ID(required=True))
     all_ingredients = graphene.List(IngredientType)
-    category_by_name = graphene.Field(CategoryType, name=graphene.String(required=True))
+    all_items = graphene.List(ItemType)
+    get_item = graphene.Field(ItemType,id=graphene.ID(required=True))
+    all_photos = graphene.List(PhotoType,item=graphene.ID(required=True))
+
+    def resolve_all_categories(root,info):
+        return Category.objects.all()
+    
+    def resolve_get_category(root,info,id):
+        try:
+            return Category.objects.get(id=id)
+        except Category.DoesNotExist:
+            return None        
 
     def resolve_all_ingredients(root, info):
         # We can easily optimize query count in the resolve method
         return Ingredient.objects.select_related("category").all()
 
-    def resolve_category_by_name(root, info, name):
+        
+    def resolve_all_items(root,info):
+        return Item.objects.all()
+    
+    def resolve_get_item(root,info,id):
         try:
-            return Category.objects.get(name=name)
-        except Category.DoesNotExist:
+            return Item.objects.get(id=id)
+        except Item.DoesNotExist:
             return None
+        
+    def resolve_all_photos(root,info,item):
+        try:
+            a = Item.objects.get(id=item)
+            return Photo.objects.all().filter(item=a)
+        except Item.DoesNotExist:
+            return None
+
 
 class CreateCategory(graphene.Mutation):
     class Arguments:
@@ -62,6 +87,8 @@ class Mutation(graphene.ObjectType):
     create_category = CreateCategory.Field()
     update_category = UpdateCategory.Field()
     delete_category = DeleteCategory.Field()
+
+
 
 
 
