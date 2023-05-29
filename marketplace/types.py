@@ -1,17 +1,17 @@
 
-from .models import Category, Ingredient, Item, Photo
+from .models import *
 import graphene
 from graphene_django import DjangoObjectType
 
 class CategoryType(DjangoObjectType):
     class Meta:
         model = Category
-        fields = ("id", "name", "ingredients")
+        fields = ("id", "name")
 
-class IngredientType(DjangoObjectType):
-    class Meta:
-        model = Ingredient
-        fields = ("id", "name", "notes", "category")
+# class IngredientType(DjangoObjectType):
+#     class Meta:
+#         model = Ingredient
+#         fields = ("id", "name", "notes", "category")
 
 class ItemType(DjangoObjectType):
     class Meta:

@@ -9,8 +9,8 @@ class Query(graphene.ObjectType):
     category = relay.Node.Field(CategoryNode)
     all_categories = DjangoFilterConnectionField(CategoryNode)
 
-    ingredient = relay.Node.Field(IngredientNode)
-    all_ingredients = DjangoFilterConnectionField(IngredientNode)
+    # ingredient = relay.Node.Field(IngredientNode)
+    # all_ingredients = DjangoFilterConnectionField(IngredientNode)
 
 class Mutation(graphene.ObjectType):
     pass

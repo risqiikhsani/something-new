@@ -1,6 +1,6 @@
 
 
-from .models import Category, Ingredient
+from .models import *
 import graphene
 from graphene_django import DjangoObjectType
 from .types import *
@@ -9,7 +9,6 @@ from .models import *
 class Query(graphene.ObjectType):
     all_categories = graphene.List(CategoryType)
     get_category = graphene.Field(CategoryType,id=graphene.ID(required=True))
-    all_ingredients = graphene.List(IngredientType)
     all_items = graphene.List(ItemType)
     get_item = graphene.Field(ItemType,id=graphene.ID(required=True))
     all_photos = graphene.List(PhotoType,item=graphene.ID(required=True))
@@ -22,10 +21,6 @@ class Query(graphene.ObjectType):
             return Category.objects.get(id=id)
         except Category.DoesNotExist:
             return None        
-
-    def resolve_all_ingredients(root, info):
-        # We can easily optimize query count in the resolve method
-        return Ingredient.objects.select_related("category").all()
 
         
     def resolve_all_items(root,info):
@@ -82,7 +77,9 @@ class DeleteCategory(graphene.Mutation):
         a = Category.objects.get(id=id)
         a.delete()
         return
-    
+
+
+
 class Mutation(graphene.ObjectType):
     create_category = CreateCategory.Field()
     update_category = UpdateCategory.Field()
