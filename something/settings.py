@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     # 'allauth.socialaccount.providers.github',
     # 'allauth.socialaccount.providers.google',
     'graphene_django',
+    'phonenumber_field',
     'marketplace',
     'realtime',
     'app',

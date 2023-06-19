@@ -9,6 +9,7 @@ from .models import CustomUser, Profile, Connection, Request,Relationship, Block
 from django import forms
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
@@ -53,14 +54,15 @@ class UserChangeForm(forms.ModelForm):
         help_text=("Raw passwords are not stored, so there is no way to see "
                     "this user's password, but you can change the password "
                     "using <a href=\"../password/\">this form</a>."))
-	class Meta:
+	class Meta(BaseUserChangeForm.Meta):
 		model = User
-		fields = ('email', 'password', 'phone_number', 'is_active', 'is_staff')
-	
+		# fields = ('email', 'password', 'phone_number', 'is_active', 'is_staff')
+
+# https://stackoverflow.com/questions/15012235/using-django-auth-useradmin-for-a-custom-user-model
 class UserAdmin(BaseUserAdmin):
 	# The forms to add and change user instances
-	form = UserChangeForm
-	add_form = UserCreationForm
+	# form = UserChangeForm
+	# add_form = UserCreationForm
 
 	# The fields to be used in displaying the User model.
 	# These override the definitions on the base UserAdmin
@@ -87,18 +89,25 @@ class UserAdmin(BaseUserAdmin):
 
 	fieldsets = (
 		(None, {'fields': ('username', 'password')}),
-		('Personal info', {'fields': ('phone_number','email')}),
-		('Permissions', {'fields': ('is_staff','is_active')}),
+		('Personal info', {'fields': ('phone_number','email','email_verified')}),
+		('Permissions', {'fields': ('is_staff','is_active','groups')}),
 	)
+
+	## will error because BaseUserAdmin has last_name and first_name , we have removed them in CustomUser
+	# fieldsets = BaseUserAdmin.fieldsets + (
+	# 	(None, {'fields': ('phone_number',)}),
+	# )
 
 	# add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
 	# overrides get_fieldsets to use this attribute when creating a user.
-	add_fieldsets = (
-		(None, {
-			'classes': ('wide',),
-			'fields': ('username', 'password1', 'password2'),
-		}),
-	)
+	# add_fieldsets = (
+	# 	(None, {
+	# 		'classes': ('wide',),
+	# 		'fields': ('username', 'password1', 'password2'),
+	# 	}),
+	# )
+
+	add_fieldsets = BaseUserAdmin.add_fieldsets
 
 	search_fields = ('username',)
 
