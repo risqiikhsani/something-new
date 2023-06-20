@@ -12,6 +12,9 @@ from .views_auth import(
     ChangePassword,
     SendEmailVerification,
     EmailVerification,
+
+    ForgotPassword,
+    ForgotPasswordConfirm,
 )
 
 from .views_auth2 import (
@@ -45,7 +48,17 @@ urlpatterns = [
     path('login',Login.as_view(), name='login'),
     path('login/google',GoogleLoginApi.as_view(), name='login-google'),
     path('token-refresh', TokenRefreshView.as_view(), name='refresh-token'),
+
+
+    path('forgot-password', ForgotPassword.as_view(), name='forgot-password'),
+    path('forgot-password-confirm',ForgotPasswordConfirm.as_view(), name='forgot-password-confirm'),
+
     path('change-password', ChangePassword.as_view(), name='change-password'),
+
+
+
+
+    
     path('send-email-verification',SendEmailVerification.as_view(),name="send-email-verification"),
     path('email-verification/<str:uuid>',EmailVerification.as_view(),name="email-verification"),
     

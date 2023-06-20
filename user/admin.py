@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-from .models import CustomUser, Profile, Connection, Request,Relationship, Block
+from .models import CustomUser, Profile, Connection, Request,Relationship, Block, PasswordResetRequest
 
 
 from django import forms
@@ -133,7 +133,11 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 
-
+@admin.register(PasswordResetRequest)
+class PasswordResetRequestAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'token', 'created_at')
+    list_filter = ('user', 'created_at')
+    date_hierarchy = 'created_at'
 
 @admin.register(Connection)
 class ConnectionAdmin(admin.ModelAdmin):

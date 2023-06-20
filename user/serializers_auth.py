@@ -70,6 +70,21 @@ class Register_Serializer(serializers.ModelSerializer):
 		user.save()
 		return user
 
+class ForgotPassword_Serializer(serializers.Serializer):
+	email = serializers.CharField(required=True,write_only=True)
+
+class ForgotPasswordConfirm_Serializer(serializers.Serializer):
+	token = serializers.CharField(write_only=True,required=True)
+	password = serializers.CharField(write_only=True,required=True)
+	confirm_password = serializers.CharField(write_only=True,required=True)
+
+	def validate(self,attrs):
+		if attrs['password'] != attrs['confirm_password']:
+			raise serializers.ValidationError({"password": "Password fields didn't match."})
+
+		return attrs
+
+
 
 class ChangePassword_Serializer(serializers.ModelSerializer):
 	old_password = serializers.CharField(write_only=True,required=True)
