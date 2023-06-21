@@ -144,6 +144,15 @@ class ChangePassword(generics.GenericAPIView):
                                          'request': request}, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
+            #send email if password is changed
+            app_name = "Testing"
+            name = queryset.profile.name
+            subject = f'Verification from {app_name} App'
+            reset_password_url = 'http/localhost:3000/reset-password'
+            message = f'Hi {name} , You have successfully changed your password. If it was not you , please reset your password. Visit this link {reset_password_url}'
+            email_from = settings.EMAIL_HOST_USER
+            recepient_list = [queryset.email,]
+            send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
             return Response({"message":"password updated successfully"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
