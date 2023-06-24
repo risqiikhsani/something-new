@@ -1,12 +1,11 @@
 from django.test import TestCase
 
-# Create your tests here.
-
 from .models import *
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
@@ -15,25 +14,30 @@ class UserTestCase(APITestCase):
         self.register_url = reverse('register')
         self.login_url = reverse('login')
         self.register_data = {
-            "username":"testingusername",
-            "email":"testing@gmail.com",
-            "password":"password",
-            "password2":"password",
+            "username": "testingusername",
+            "email": "testing@gmail.com",
+            "password": "password",
+            "password2": "password",
         }
         self.login_data = {
-            "username":"testingusername",
-            "password":"password",
+            "username": "testingusername",
+            "password": "password",
         }
+        self.user = None
 
-    def authenticate(self, is_staff=False):
+    def create_user(self):
         response = self.client.post(self.register_url, self.register_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.all().count(), 1)
+        self.user = User.objects.get(username=self.register_data['username'])
+
+    def authenticate(self, is_staff=False):
+        if not self.user:
+            self.create_user()
 
         if is_staff:
-            user = User.objects.get(id=1)
-            user.is_staff = True
-            user.save()
+            self.user.is_staff = True
+            self.user.save()
 
         response = self.client.post(self.login_url, self.login_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -50,20 +54,6 @@ class UserTestCase(APITestCase):
         response = self.client.put(self.change_password_url, self.change_password_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        self.login_data = {
-            "username": "testingusername",
-            "password": "password123",
-        }
-
+        self.login_data['password'] = "password123"
         response = self.client.post(self.login_url, self.login_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
-
-
-
-    # def test_should_not_create_todo_with_no_auth(self):
-    #     pass
-
-    # def test_should_create_todo_with_auth(self):
-    #     self.test_authenticate()
-
