@@ -172,3 +172,7 @@ class Like_Serializer(serializers.ModelSerializer):
         fields = ['user']
         read_only_fields = ['user']
 
+class Report_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = '__all__'

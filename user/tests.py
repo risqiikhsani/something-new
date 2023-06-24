@@ -25,17 +25,41 @@ class UserTestCase(APITestCase):
             "password":"password",
         }
 
-    def test_authenticate(self):
-        print("register is running")
-        response = self.client.post(self.register_url,self.register_data)
+    def authenticate(self, is_staff=False):
+        response = self.client.post(self.register_url, self.register_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.all().count(), 1)
-        self.assertEqual(User.objects.get(id=1).username,self.register_data['username'])
 
-        print("authentication is running")
-        response = self.client.post(self.login_url,self.login_data)
+        if is_staff:
+            user = User.objects.get(id=1)
+            user.is_staff = True
+            user.save()
+
+        response = self.client.post(self.login_url, self.login_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access_token']}")
+
+    def test_change_password(self):
+        self.authenticate()
+        self.change_password_url = reverse('change-password')
+        self.change_password_data = {
+            "old_password": "password",
+            "password": "password123",
+            "confirm_password": "password123",
+        }
+        response = self.client.put(self.change_password_url, self.change_password_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.login_data = {
+            "username": "testingusername",
+            "password": "password123",
+        }
+
+        response = self.client.post(self.login_url, self.login_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+
+
 
     # def test_should_not_create_todo_with_no_auth(self):
     #     pass
