@@ -23,4 +23,5 @@ media
 /media/
 
 # Virtual environment
+myenv
 myenv/
