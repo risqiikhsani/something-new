@@ -8,10 +8,29 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
+class Profile_Simple_Serializer(serializers.ModelSerializer):
+	profile_picture = VersatileImageFieldSerializer(
+		sizes=[
+			('full_size', 'url'),
+            ('small', 'thumbnail__200x200'),
+            ('medium', 'thumbnail__400x400'),
+		]
+	)
+	class Meta:
+		model = Profile
+		fields = ['name','public_username','profile_picture',]
+
+class User_Simple_Serializer(serializers.ModelSerializer):
+	profile = Profile_Simple_Serializer()
+	
+	class Meta:
+		model = CustomUser
+		fields = ['id','profile']
 
 class Login_Serializer(serializers.Serializer):
 	username = serializers.CharField(max_length=300,required=True)
 	password = serializers.CharField(required=True,write_only=True)
+
 
 
 class Register_Serializer(serializers.ModelSerializer):
@@ -52,10 +71,16 @@ class Register_Serializer(serializers.ModelSerializer):
 		return user
 
 class ForgotPassword_Serializer(serializers.Serializer):
-	email = serializers.CharField(required=True,write_only=True)
+	email = serializers.CharField(write_only=True)
+
+class ForgotPasswordCheck_Serializer(serializers.Serializer):
+	email = serializers.CharField(write_only=True)
+	code = serializers.CharField(write_only=True)
 
 class ForgotPasswordConfirm_Serializer(serializers.Serializer):
-	token = serializers.CharField(write_only=True,required=True)
+	email = serializers.CharField(write_only=True)
+	code = serializers.CharField(write_only=True)
+	token = serializers.CharField(write_only=True,required=False)
 	password = serializers.CharField(write_only=True,required=True)
 	confirm_password = serializers.CharField(write_only=True,required=True)
 

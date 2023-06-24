@@ -14,6 +14,7 @@ from .views_auth import(
     EmailVerification,
 
     ForgotPassword,
+    ForgotPasswordCheckOptional,
     ForgotPasswordConfirm,
 )
 
@@ -41,9 +42,9 @@ from .views import (
 )   
 
 
+from .staff_rest.urls import restricted_urlpatterns
 
-
-urlpatterns = [
+urlpatterns = restricted_urlpatterns + [
     path('register',Register.as_view(), name='register'),
     path('login',Login.as_view(), name='login'),
     path('login/google',GoogleLoginApi.as_view(), name='login-google'),
@@ -51,6 +52,7 @@ urlpatterns = [
 
 
     path('forgot-password', ForgotPassword.as_view(), name='forgot-password'),
+    path('forgot-password-check-optional',ForgotPasswordCheckOptional.as_view(), name='forgot-password-check-optional'),
     path('forgot-password-confirm',ForgotPasswordConfirm.as_view(), name='forgot-password-confirm'),
 
     path('change-password', ChangePassword.as_view(), name='change-password'),

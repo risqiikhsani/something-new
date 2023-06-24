@@ -1,19 +1,41 @@
+# version: '3.8'
+# services:
+#   db:
+#     container_name: pg_container
+#     image: postgres
+#     restart: always
+#     environment:
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#       # POSTGRES_DB: test_db
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - local_pgdata:/var/lib/postgresql/data
+#   pgadmin:
+#     container_name: pgadmin4_container
+#     image: dpage/pgadmin4
+#     restart: always
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+#       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+#     ports:
+#       - "80:80"
+#     volumes:
+#       - pgadmin-data:/var/lib/pgadmin
+#   redis:
+#       container_name: redis_container
+#       image: redis:5
+#       ports:
+#         - '6379:6379'
+
+
+# volumes:
+#   local_pgdata:
+#   pgadmin-data:
+
 version: '3.8'
 services:
-  # backend:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: 
-  #     - 'celery -A something.celery worker --loglevel=debug --concurrency=4'
-  #     - 'python manage.py runserver 0.0.0.0:8000'
-  #   ports:
-  #     - 8000:8000
-  #   volumes:
-  #     - .:/app
-  #   depends_on:
-  #     - db
-  #     - redis
   db:
     container_name: pg_container
     image: postgres
@@ -21,11 +43,11 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      # POSTGRES_DB: test_db
     ports:
       - "5432:5432"
     volumes:
       - local_pgdata:/var/lib/postgresql/data
+
   pgadmin:
     container_name: pgadmin4_container
     image: dpage/pgadmin4
@@ -37,12 +59,38 @@ services:
       - "80:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-  redis:
-      container_name: redis_container
-      image: redis:5
-      ports:
-        - '6379:6379'
 
+  redis:
+    container_name: redis_container
+    image: redis:5
+    ports:
+      - '6379:6379'
+
+  celery_worker:
+    container_name: celery_worker_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A something.celery worker --loglevel=debug --concurrency=4
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  django_app:
+    container_name: django_app_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
 
 volumes:
   local_pgdata:

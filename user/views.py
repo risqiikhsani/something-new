@@ -74,8 +74,6 @@ class my_user(generics.RetrieveUpdateAPIView):
 	serializer_class = my_user_serializer
 	queryset = User.objects.all()
 
-
-
 	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
 	def get_object(self):
 		queryset = self.get_queryset()

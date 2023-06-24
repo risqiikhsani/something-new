@@ -135,7 +135,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(PasswordResetRequest)
 class PasswordResetRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'token', 'created_at')
+    list_display = ('id', 'user', 'token','code', 'created_at')
     list_filter = ('user', 'created_at')
     date_hierarchy = 'created_at'
 
