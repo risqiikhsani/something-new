@@ -66,31 +66,31 @@ services:
     ports:
       - '6379:6379'
 
-  celery_worker:
-    container_name: celery_worker_container
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: celery -A something.celery worker --loglevel=debug --concurrency=4
-    depends_on:
-      - db
-      - redis
-    volumes:
-      - .:/app
+  # celery_worker:
+  #   container_name: celery_worker_container
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: celery -A something.celery worker --loglevel=debug --concurrency=4
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   volumes:
+  #     - .:/app
 
-  django_app:
-    container_name: django_app_container
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
-    depends_on:
-      - db
-      - redis
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
+  # django_app:
+  #   container_name: django_app_container
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: python manage.py runserver 0.0.0.0:8000
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - .:/app
 
 volumes:
   local_pgdata:
