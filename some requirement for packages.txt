@@ -1,7 +1,0 @@
-First install the prerequisites (not needed on Windows, please adapt to your *nix distribution):
-
-sudo apt install python3-dev libpq-dev
-
-Then install the module:
-
-pip install psycopg2

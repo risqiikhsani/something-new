@@ -10,3 +10,52 @@ https://pypi.org/project/python-magic/
 linux can't pip install psycopg2 , pip install psycopg2-binary instead
 
 package of pscopg2 (linux should install the posgrest first)
+
+___________________________________________________________________________________________
+
+First install the prerequisites (not needed on Windows, please adapt to your *nix distribution):
+
+sudo apt install python3-dev libpq-dev
+
+Then install the module:
+
+pip install psycopg2
+
+_______________________ IMPORT DATA FROM SQLITE TO POSTGRES _________________________________
+
+1.  change settings to use sqlite database , or change POSTGRES=FALSE in .env
+2.  python manage.py dumpdata > data.json
+
+3.  change settings to use postgres database , or change POSTGRES=TRUE in .env
+4.  python manage.py migrate --run-syncdb
+
+5.  python manage.py shell
+
+>>> from django.contrib.contenttypes.models import ContentType
+>>> ContentType.objects.all().delete()
+>>> quit()
+
+6.  comment all codes in all signals.py
+
+7.  python manage.py loaddata data.json
+
+8.  uncomment all codes in all signals.py
+
+____________________________ GOOGLE ____________________________
+https://accounts.google.com/o/oauth2/v2/auth
+
+client_id =
+response_type = code
+scope = email 
+redirect_uri = 
+access_type = offline
+
+
+POST
+https://accounts.google.com/o/oauth2/token
+
+code = 
+client_id = 
+client_secret = 
+redirect_uri = 
+grant_type = authorization_code

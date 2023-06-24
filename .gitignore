@@ -1,13 +1,25 @@
-.env
 
+.env
 *.log
 *.pot
+# Django-related
 *.pyc
+*.pyo
+*.pyd
+__pycache__
 __pycache__/
-local_settings.py
-# db.sqlite3
-# db.sqlite3-journal
+*.sqlite3
+*.pyc
+*.bak
+*.swp
+
+# Static files
+/staticfiles/
+*.static
+
+# Media files
 media
-myenv
-changed_name_for_testing_media
-changed_name_for_testing_media/
+/media/
+
+# Virtual environment
+myenv/
