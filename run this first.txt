@@ -27,8 +27,9 @@ https://medium.com/@benjamin.pereto/microservices-with-django-events-with-publis
 
 run test
 
+python manage.py test --noinput
 if a test run is forcefully interrupted, the test database may not be destroyed. On the next run, you’ll be asked whether you want to reuse or destroy the database. 
 Use the test --noinput option to suppress that prompt and automatically destroy the database. 
 This can be useful when running tests on a continuous integration server where tests may be interrupted by a timeout, for example.
 
-python manage.py test --noinput
+
