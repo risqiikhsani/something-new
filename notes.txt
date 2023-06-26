@@ -59,3 +59,15 @@ client_id =
 client_secret = 
 redirect_uri = 
 grant_type = authorization_code
+
+
+
+__________________________________________________________________________________________
+error when running celery_worker image
+https://github.com/Yelp/elastalert/issues/1927
+https://stackoverflow.com/questions/59661022/django-versatileimagefield-issues-no-matching-distribution-found-for-python-ma
+solved by adding this to Dockerfile
+RUN apt-get update && apt-get install -y libmagic-dev
+
+
+

@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.9-slim
+FROM python:3.9-slim-buster
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -7,6 +7,10 @@ ENV PYTHONUNBUFFERED 1
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Install system dependencies
+# libmagic is required for celery_worker container to run, see notes.txt
+RUN apt-get update && apt-get install -y libmagic-dev
 
 # Copy the requirements file and install dependencies
 COPY requirements.txt .

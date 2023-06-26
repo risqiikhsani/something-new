@@ -10,13 +10,16 @@ from something.celery import app
 
 from django.conf import settings
 
-@app.task
 
-def send_welcome_email(instance):
-    app_name = "Testing"
-    name = instance.username
-    subject = f'Welcome to {app_name} App'
-    message = f'Hi {name} ,thankyou for registering in {app_name}.'
+
+@app.task
+def send_email(subject, message, recipient_list):
     email_from = settings.EMAIL_HOST_USER
-    recepient_list = [instance.email,]
-    send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
+
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email=email_from,
+        recipient_list=recipient_list,
+        fail_silently=False
+    )

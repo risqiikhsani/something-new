@@ -14,6 +14,9 @@ from django.core.mail import send_mail
 
 from .tasks import *
 
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Verification, dispatch_uid="unique")
 def verificationSignal(sender,instance,created,**kwargs):
     if created:
         # this is usually for changing email , require code verification sent to old email
@@ -24,20 +27,28 @@ def verificationSignal(sender,instance,created,**kwargs):
         if instance.uuid:
             if not instance.user.email_verified:
                 if instance.user.email:
-                    print("sending email...")
+                    recipient_list = [instance.email,]
                     app_name = "Testing"
-                    name = instance.username
+                    subject = f'Verification from{app_name} App'
                     verification_url = instance.uuid
+                    message = f'Hi {instance.name} ,visit this link to verify your email address. {verification_url}'
+                    send_email.delay(subject,message,recipient_list)
 
-                    subject = f'Verification from {app_name} App'
-                    message = f'Hi {name} , visit this link to verify your email address. {verification_url}'
-                    email_from = settings.EMAIL_HOST_USER
-                    recepient_list = [instance.email,]
-                    send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
 
-post_save.connect(verificationSignal,sender=Verification,dispatch_uid="unique")
+@receiver(post_save,sender=PasswordResetRequest,dispatch_uid="unique")
+def ForgotPasswordSignal(sender,instance,created,**kwargs):
+    if created:
+        app_name = "Testing"
+        subject = f'Verification from {app_name} App'
+        message = f'Hi {instance.user.profile.name} , This is your 4 digit verification code. {instance.code} . The code will expire in 10 minutes.'
+        recipient_list = [instance.user.email,]
+        send_email.delay(subject,message,recipient_list)
 
+
+
+@receiver(post_save, sender=User, dispatch_uid="unique")
 def userMainSignal(sender,instance,created,**kwargs):
+    # if user is created
     if created:
         print("signal : create profile")
         random_unique_string = str(get_random_alphanumeric_string(5)) + str(instance.id) + str(get_random_alphanumeric_string(5))
@@ -53,37 +64,34 @@ def userMainSignal(sender,instance,created,**kwargs):
             user=instance,
         )
 
-        # if there's email
+        # if there's email, send a welcome email
         if instance.email:
-            pass
-            #send email
-            # print("sending email...")
-            # send_welcome_email.delay(instance)
-            # app_name = "Testing"
-            # name = instance.username
-            # subject = f'Welcome to {app_name} App'
-            # message = f'Hi {name} ,thankyou for registering in {app_name}.'
-            # email_from = settings.EMAIL_HOST_USER
-            # recepient_list = [instance.email,]
-            # send_mail(subject,message,email_from,recepient_list)
+            recipient_list = [instance.email,]
+            app_name = "Testing"
+            subject = f'Welcome to {app_name} App'
+            message = f'Hi {instance.name} ,thank you for registering in {app_name}.'
+            send_email.delay(subject,message,recipient_list)
+    # if user updated their account, send a notification email
+    #if not created:
+    else:
+        if instance.email:
+            recipient_list = [instance.email,]
+            app_name = "Testing"
+            subject = f'{app_name} App'
+            message = f'Hi {instance.name} ,You have successfully updated your account in {app_name}.'
+            send_email.delay(subject,message,recipient_list)
+        
+        # Password has been updated
+        if 'password' in instance.changed_fields:
+            recipient_list = [instance.email,]
+            app_name = "Testing"
+            subject = f'{app_name} App'
+            reset_password_url = 'http/localhost:3000/reset-password'
+            message = f'Hi {instance.name} , You have successfully changed your password. If it was not you , please reset your password. Visit this link {reset_password_url}'
+            send_email.delay(subject,message,recipient_list)
+        
 
-    # https://stackoverflow.com/questions/7375875/django-post-save-signals-on-update
-    # do something when user updated their account
-    # if not created:
-    #     if instance.email:
-    #         print("sending email...")
-    #         send_welcome_email.delay(instance)
-            # app_name = "Testing"
-            # name = instance.username
-            # subject = f'Welcome to {app_name} App'
-            # message = f'Hi {name} ,thankyou for registering in {app_name}.'
-            # email_from = settings.EMAIL_HOST_USER
-            # recepient_list = [instance.email,]
-            # send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
-
-                
-post_save.connect(userMainSignal,sender=User,dispatch_uid="unique")
-
+@receiver(post_save, sender=Request, dispatch_uid="unique")
 def requestAction(sender,instance,created,**kwargs):
     print("signal : requestAction")
     # TESTED = WORKS !
@@ -99,60 +107,39 @@ def requestAction(sender,instance,created,**kwargs):
         instance.delete()
 
 
-post_save.connect(requestAction,sender=Request,dispatch_uid="unique")
-
 
 # https://docs.djangoproject.com/en/4.1/ref/signals/#m2m-changed
-def connectionM2mAction(sender,instance,action,pk_set,model,**kwargs):
-    # TESTED = WORKS !
-    # if user connected with other user , do this
+@receiver(m2m_changed, sender=Connection.connected.through)
+def connectionM2mAction(sender, instance, action, pk_set, model, **kwargs):
+     # if user connected with other user , do this
     if action == 'post_add':
-        # print(sender)
-        # print(instance)
-        # print(action)
-        # print(pk_set)
-        
-        # print(model)
-        # <class 'user.models.Connection_connected'>
-        # 2
-        # post_add
-        # {1}
-        # <class 'user.models.Connection'>
-
-        # create 2 relationship for each
         user = instance.user
         to_user = model.objects.get(pk=list(pk_set)[0]).user
-
-        r1,created = Relationship.objects.get_or_create(user = user,to_user = to_user,)
-        r1.save()
-
-        r2, created = Relationship.objects.get_or_create(user= to_user,to_user = user,)
-        r2.save()
-
-    # TESTED = WORKS
-    # if user disconnected from other user, do this
+        create_relationship(user, to_user)
+        create_relationship(to_user, user)
+     # if user disconnected from other user, do this
     elif action == 'post_remove':
-        # delete 2 relationship for each
         user = instance.user
         to_user = model.objects.get(pk=list(pk_set)[0]).user
-        
-        try:
-            r1 = Relationship.objects.get(user=user,to_user=to_user)
-            r1.delete()
-        # this is for error handler if you deleted the relationship first in django admin
-        except Relationship.DoesNotExist:
-            pass
+        delete_relationship(user, to_user)
+        delete_relationship(to_user, user)
 
-        try:
-            r2 = Relationship.objects.get(user=to_user,to_user=user)
-            r2.delete()
-        # this is for error handler if you deleted the relationship first in django admin
-        except Relationship.DoesNotExist:
-            pass
 
-m2m_changed.connect(connectionM2mAction,sender=Connection.connected.through)
+def create_relationship(user, to_user):
+    relationship, created = Relationship.objects.get_or_create(user=user, to_user=to_user)
+    relationship.save()
+
+
+def delete_relationship(user, to_user):
+    try:
+        relationship = Relationship.objects.get(user=user, to_user=to_user)
+        relationship.delete()
+    except Relationship.DoesNotExist:
+        pass
+
 
 # when the user block others
+@receiver(post_save, sender=Block, dispatch_uid="unique")
 def blockCreatedAction(sender,instance,created,**kwargs):
     # if the block is created
     if created:
@@ -163,20 +150,18 @@ def blockCreatedAction(sender,instance,created,**kwargs):
             c2 = Connection.objects.get(user= instance.blocked)
             c1.connected.remove(c2)
 
-post_save.connect(blockCreatedAction,sender=Block,dispatch_uid="unique")
-
 
 # when the user unblock others
+@receiver(post_delete, sender=Block, dispatch_uid="unique")
 def blockDeletedAction(sender,instance,*args,**kwargs):
     # if request of accepted was exists . means they were friends
     if Request.objects.filter(user=instance.user,sender=instance.blocked,accept=True).exists():
         # recreate the connection
         instance.user.connection.connected.add(instance.blocked.connection)
 
-post_delete.connect(blockDeletedAction,sender=Block,dispatch_uid="unique")
 
 
-
+@receiver(post_delete, sender=Profile, dispatch_uid="unique")
 def auto_clear_files_on_delete(sender,instance,*args,**kwargs):
     print("file handler signal is running")
     # delete filtered and sized cache images
@@ -195,45 +180,78 @@ def auto_clear_files_on_delete(sender,instance,*args,**kwargs):
         pass
 
 
-post_delete.connect(auto_clear_files_on_delete,sender=Profile,dispatch_uid="unique")
 
-
-
-def auto_delete_file_on_change(sender,instance,**kwargs):
+@receiver(pre_save, sender=Profile, dispatch_uid="unique")
+def auto_delete_file_on_change(sender, instance, **kwargs):
     """
-    Deletes old file from filesystem
-    when corresponding `MediaFile` object is updated
-    with new file.
+    Deletes the old file from the filesystem when corresponding `MediaFile` object is updated with a new file.
     """
     if not instance.pk:
         return False
 
-    # handle update/delete profile_picture
-    try:
-        old_file = sender.objects.get(pk=instance.pk).profile_picture
-    except sender.DoesNotExist:
-        return False
+    # Handle update/delete profile_picture
+    handle_file_change(sender, instance, 'profile_picture')
 
-    new_file = instance.profile_picture
+    # Handle update/delete poster_picture
+    handle_file_change(sender, instance, 'poster_picture')
+
+
+def handle_file_change(sender, instance, field_name):
+    old_file = get_old_file(sender, instance, field_name)
+    new_file = get_new_file(sender, instance, field_name)
+
     if not old_file == new_file:
-        if not old_file:
-            return False
-        if os.path.isfile(old_file.path):
+        if old_file and os.path.isfile(old_file.path):
             os.remove(old_file.path)
             old_file.delete_all_created_images()
-    # handle update/delete poster_picture
+
+
+def get_old_file(sender, instance, field_name):
     try:
-        old_file_b = sender.objects.get(pk=instance.pk).poster_picture
+        old_instance = sender.objects.get(pk=instance.pk)
+        return getattr(old_instance, field_name)
     except sender.DoesNotExist:
-        return False
-
-    new_file_b = instance.poster_picture
-    if not old_file_b == new_file_b:
-        if not old_file_b:
-            return False
-        if os.path.isfile(old_file_b.path):
-            os.remove(old_file_b.path)
-            old_file_b.delete_all_created_images()
+        return None
 
 
-pre_save.connect(auto_delete_file_on_change,sender=Profile,dispatch_uid="unique")
+def get_new_file(sender, instance, field_name):
+    return getattr(instance, field_name)
+
+# def auto_delete_file_on_change(sender,instance,**kwargs):
+#     """
+#     Deletes old file from filesystem
+#     when corresponding `MediaFile` object is updated
+#     with new file.
+#     """
+#     if not instance.pk:
+#         return False
+
+#     # handle update/delete profile_picture
+#     try:
+#         old_file = sender.objects.get(pk=instance.pk).profile_picture
+#     except sender.DoesNotExist:
+#         return False
+
+#     new_file = instance.profile_picture
+#     if not old_file == new_file:
+#         if not old_file:
+#             return False
+#         if os.path.isfile(old_file.path):
+#             os.remove(old_file.path)
+#             old_file.delete_all_created_images()
+#     # handle update/delete poster_picture
+#     try:
+#         old_file_b = sender.objects.get(pk=instance.pk).poster_picture
+#     except sender.DoesNotExist:
+#         return False
+
+#     new_file_b = instance.poster_picture
+#     if not old_file_b == new_file_b:
+#         if not old_file_b:
+#             return False
+#         if os.path.isfile(old_file_b.path):
+#             os.remove(old_file_b.path)
+#             old_file_b.delete_all_created_images()
+
+
+# pre_save.connect(auto_delete_file_on_change,sender=Profile,dispatch_uid="unique")

@@ -36,11 +36,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY =  str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DEBUG'))
+DEBUG = bool(int(os.getenv('DEBUG', 0)))
 
 BASE_BACKEND_URL = str(os.getenv('BASE_BACKEND_URL'))
 BASE_FRONTEND_URL = str(os.getenv('BASE_FRONTEND_URL'))
 BASE_FRONTEND_LOGIN_URL = str(os.getenv('BASE_FRONTEND_LOGIN_URL'))
+
+#deployment
+#https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
     'somethingnew-testing.herokuapp.com',
@@ -61,16 +66,6 @@ INSTALLED_APPS = [
     # 'daphne', ## this will use ASGI version 4
     # in order to use 'daphne' intead of 'channels' , reinstall the latest pip channels_redis version
     # but there's gonna be some error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
-    
-    # 'rest_framework.authtoken',
-    # 'dj_rest_auth',
-    # 'dj_rest_auth.registration',
-    # 'django.contrib.sites',    
-    # 'allauth',    
-    # 'allauth.account',    
-    # 'allauth.socialaccount',        
-    # 'allauth.socialaccount.providers.github',
-    # 'allauth.socialaccount.providers.google',
     'graphene_django',
     'phonenumber_field',
     'marketplace',
@@ -176,7 +171,7 @@ CHANNEL_LAYERS = {
         # "BACKEND":"channels_redis.pubsub.RedisPubSubChannelLayer",
         # solved by downgrading channels_redis version to 3.3.1
         "CONFIG":{
-            "hosts":[("127.0.0.1",6379)],   # currently using docker
+            "hosts":[(os.getenv("REDIS_HOST"), int(os.getenv("REDIS_PORT")))],   # currently using docker
         },
     },
 }
@@ -213,12 +208,12 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-POSTGRES = str(os.getenv('POSTGRES'))
+POSTGRES = bool(int(os.getenv('POSTGRES', 0)))
 
 if DEBUG:
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-    if POSTGRES=="TRUE":
+    if POSTGRES:
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -249,8 +244,8 @@ else:
         }
     }
 
-USE_S3 = str(os.getenv('USE_S3'))
-if USE_S3 == 'TRUE':
+USE_S3 = bool(int(os.getenv('USE_S3', 0)))
+if USE_S3:
 
     #S3 BUCKETS CONFIG
 
@@ -342,23 +337,30 @@ VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
 }
 
 EMAIL_USE_TLS = True
-
 EMAIL_HOST = 'smtp.gmail.com'
-
 EMAIL_HOST_USER = str(os.getenv('EMAIL_HOST_USER'))
-
 EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD'))
-
 EMAIL_PORT = 587
 
-# celery
-REDIS_HOST = 'localhost' 
-REDIS_PORT = '6379' 
-BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0' 
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600} 
-CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+# # celery
+# REDIS_HOST = os.getenv("REDIS_HOST")
+# REDIS_PORT = os.getenv("REDIS_PORT")
+# BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0' 
+# BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600} 
+# CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+
+# RabbitMQ
+RABBITMQ_HOST = str(os.getenv('RABBITMQ_HOST'))
+RABBITMQ_PORT = str(os.getenv('RABBITMQ_PORT'))
+RABBITMQ_USERNAME = str(os.getenv('RABBITMQ_USERNAME'))
+RABBITMQ_PASSWORD = str(os.getenv('RABBITMQ_PASSWORD'))
+
+# Celery
+BROKER_URL = 'amqp://'+RABBITMQ_USERNAME+':'+RABBITMQ_PASSWORD+'@'+RABBITMQ_HOST+':'+RABBITMQ_PORT+'//'
+CELERY_RESULT_BACKEND = 'rpc://'
 
 GOOGLE_OAUTH2_CLIENT_ID = str(os.getenv('GOOGLE_OAUTH2_CLIENT_ID'))
 GOOGLE_OAUTH2_CLIENT_SECRET = str(os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET'))
+
 
 

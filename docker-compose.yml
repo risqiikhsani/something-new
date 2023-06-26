@@ -66,31 +66,43 @@ services:
     ports:
       - '6379:6379'
 
-  # celery_worker:
-  #   container_name: celery_worker_container
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: celery -A something.celery worker --loglevel=debug --concurrency=4
-  #   depends_on:
-  #     - db
-  #     - redis
-  #   volumes:
-  #     - .:/app
+  rabbitmq:
+    container_name: rabbitmq_container
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'  # RabbitMQ
+      - '15672:15672'  # RabbitMQ Management Plugin
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
 
-  # django_app:
-  #   container_name: django_app_container
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: python manage.py runserver 0.0.0.0:8000
-  #   depends_on:
-  #     - db
-  #     - redis
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - .:/app
+  celery_worker:
+    container_name: celery_worker_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A something.celery worker -l info --concurrency=4
+    depends_on:
+      - db
+      - rabbitmq
+    volumes:
+      - .:/app
+
+  django_app:
+    container_name: django_app_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+      - celery_worker
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
 
 volumes:
   local_pgdata:

@@ -40,10 +40,9 @@ class Register(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        if serializer.is_valid(raise_exception=True):
             return Response({"message":"Account registered successfully!"}, status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class Login(generics.GenericAPIView):
@@ -71,8 +70,6 @@ class Login(generics.GenericAPIView):
             }
 
             return Response(data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 # from .serializers_auth import ForgotPassword_Serializer
 # class ForgotPassword(generics.GenericAPIView):
@@ -141,18 +138,8 @@ class ForgotPassword(generics.GenericAPIView):
             verification_code = str(randint(1000, 9999))
             # save password reset request
             password_reset_request = PasswordResetRequest(user=user, code=verification_code)
-            password_reset_request.save()
-            # send email
-            app_name = "Testing"
-            name = user.profile.name
-            subject = f'Verification from {app_name} App'
-            message = f'Hi {name} , This is your 4 digit verification code. {verification_code} . The code will expire in 10 minutes.'
-            email_from = settings.EMAIL_HOST_USER
-            recepient_list = [user.email,]
-            send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
+            password_reset_request.save()   # will trigger signal to send email
             return Response({"message":"Reset Password Guide has been sent to email"},status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 from .serializers_auth import ForgotPasswordCheck_Serializer
 class ForgotPasswordCheckOptional(generics.GenericAPIView):
@@ -163,18 +150,13 @@ class ForgotPasswordCheckOptional(generics.GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             code = serializer.validated_data.get('code')
             email = serializer.validated_data.get('email')
-            user = User.objects.get(email=email)
-            try:
-                password_reset_request = PasswordResetRequest.objects.get(code=code,user=user)
-                # user = password_reset_request.user
-                expiration_time = password_reset_request.created_at + timedelta(minutes=10)
-                if timezone.now() > expiration_time:
-                    return Response({'detail': 'Token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
-            except PasswordResetRequest.DoesNotExist:
+            user = get_object_or_404(User, email=email)
+            password_reset_request = get_object_or_404(PasswordResetRequest, code=code, user=user)
+            expiration_time = password_reset_request.created_at + timedelta(minutes=10)
+            if timezone.now() > expiration_time:
                 return Response({'detail': 'Token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
-            return Response(status=200)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_200_OK)
+
 
 from .serializers_auth import ForgotPasswordConfirm_Serializer
 class ForgotPasswordConfirm(generics.GenericAPIView):
@@ -187,22 +169,16 @@ class ForgotPasswordConfirm(generics.GenericAPIView):
             email = serializer.validated_data.get('email')
             token = serializer.validated_data.get('token')
             new_password = serializer.validated_data['password']
-            user = User.objects.get(email=email)
-            try:
-                password_reset_request = PasswordResetRequest.objects.get(code=code,user=user)
-                # user = password_reset_request.user
-                expiration_time = password_reset_request.created_at + timedelta(minutes=10)
-                if timezone.now() > expiration_time:
-                        return Response({'detail': 'Token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Reset the user's password
-                user.set_password(new_password)
-                user.save()
-            except PasswordResetRequest.DoesNotExist:
+            user = get_object_or_404(User, email=email)
+            password_reset_request = get_object_or_404(PasswordResetRequest, code=code, user=user)
+            expiration_time = password_reset_request.created_at + timedelta(minutes=10)
+            if timezone.now() > expiration_time:
                 return Response({'detail': 'Token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
-            return Response({"message":"Password updated successfully"},status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Reset the user's password
+            user.set_password(new_password)
+            user.save()
+            return Response({"message": "Password updated successfully"}, status=status.HTTP_201_CREATED)
 
 
 class ChangePassword(generics.GenericAPIView):
@@ -215,22 +191,11 @@ class ChangePassword(generics.GenericAPIView):
     def put(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
-        serializer = self.get_serializer(instance=queryset, context={
-                                         'request': request}, data=request.data)
+        serializer = self.get_serializer(instance=queryset, context={'request': request}, data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            #send email if password is changed
-            app_name = "Testing"
-            name = queryset.profile.name
-            subject = f'Verification from {app_name} App'
-            reset_password_url = 'http/localhost:3000/reset-password'
-            message = f'Hi {name} , You have successfully changed your password. If it was not you , please reset your password. Visit this link {reset_password_url}'
-            email_from = settings.EMAIL_HOST_USER
-            recepient_list = [queryset.email,]
-            send_mail(subject,message,email_from,recepient_list,fail_silently=False,)
-            return Response({"message":"password updated successfully"}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "password updated successfully"}, status=status.HTTP_201_CREATED)
+
+
 
 
 class SendEmailVerification(generics.GenericAPIView):
