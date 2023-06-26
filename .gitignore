@@ -20,7 +20,7 @@ db.sqlite3
 
 # Media files
 media
-/media/
+media/
 
 # Virtual environment
 myenv
