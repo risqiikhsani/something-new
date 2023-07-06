@@ -28,7 +28,7 @@ class AuthBackend(ModelBackend):
             print("check username is running")
             # user = CustomUser.objects.get(username=username)
             user = CustomUser.objects.get(
-                Q(username__exact=username) | 
+                Q(username__exact=username) |
                 Q(email__exact=username) |
                 Q(phone_number__exact=username)
             )

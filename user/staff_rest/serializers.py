@@ -10,13 +10,13 @@ class Profile_Simple_Serializer(serializers.ModelSerializer):
 	class Meta:
 		model = Profile
 		fields = ['name','public_username']
-		
+
 class User_Serializer(serializers.ModelSerializer):
 	profile = Profile_Simple_Serializer(required=False)
 	username = serializers.CharField(write_only=True,required=False)	# required false for update
 	password = serializers.CharField(write_only=True,required=False)	# required false for update
 	confirm_password = serializers.CharField(write_only=True,required=False)	# required false for update
-	
+
 
 	class Meta:
 		model = CustomUser
@@ -34,7 +34,7 @@ class User_Serializer(serializers.ModelSerializer):
 		user.set_password(password)
 		user.save()
 		return user
-	
+
 	def update(self, instance, validated_data):
 		# Use get() method to handle the case when username is not provided
 		instance.username = validated_data.get('username', instance.username)
@@ -50,4 +50,3 @@ class User_Serializer(serializers.ModelSerializer):
 
 		instance.save()
 		return instance
-

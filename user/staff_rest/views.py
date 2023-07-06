@@ -34,7 +34,7 @@ class UserList(mixins.ListModelMixin,
 	serializer_class = User_Serializer
 	permission_classes = [permissions.IsAuthenticated,IsStaffOrReadOnly]
 	queryset = User.objects.all()
-	
+
 	def get(self, request, *args, **kwargs):
 		return self.list(request, *args, **kwargs)
 
@@ -43,7 +43,7 @@ class UserList(mixins.ListModelMixin,
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
 		return Response(serializer.data, status=201)
-	
+
 
 class UserDetail(generics.GenericAPIView):
 	queryset = User.objects.all()
@@ -72,8 +72,3 @@ class UserDetail(generics.GenericAPIView):
 		user = self.get_object(id)
 		user.delete()
 		return Response(status=204)
-
-
-	
-	
-

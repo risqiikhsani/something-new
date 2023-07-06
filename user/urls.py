@@ -1,26 +1,16 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-
-from .views_auth import(
-    Register,
-    Login,
-    ChangePassword,
-    SendEmailVerification,
-    EmailVerification,
-
-    ForgotPassword,
-    ForgotPasswordCheckOptional,
-    ForgotPasswordConfirm,
-)
-
-from .views_auth2 import (
-    GoogleLoginApi,
-)
+from .staff_rest.urls import restricted_urlpatterns
+from .views import (ConnectionViewSet, RequestViewSet, UserDetail, UserList,
+                    UserViewSet, api_root, my_profile, my_user,
+                    user_relationship)
+from .views_auth import (ChangePassword, EmailVerification, ForgotPassword,
+                         ForgotPasswordCheckOptional, ForgotPasswordConfirm,
+                         Login, Register, SendEmailVerification)
+from .views_auth2 import GoogleLoginApi
 
 # from .views_auth2 import (
 #     FacebookLogin,
@@ -28,21 +18,9 @@ from .views_auth2 import (
 #     GoogleLogin,
 # )
 
-from .views import (
-    api_root,
-    UserList,
-    UserDetail,
-
-    ConnectionViewSet,
-    RequestViewSet,
-    UserViewSet,
-    my_user,
-    my_profile,
-    user_relationship,
-)   
 
 
-from .staff_rest.urls import restricted_urlpatterns
+
 
 urlpatterns = restricted_urlpatterns + [
     path('register',Register.as_view(), name='register'),
@@ -60,14 +38,14 @@ urlpatterns = restricted_urlpatterns + [
 
 
 
-    
+
     path('send-email-verification',SendEmailVerification.as_view(),name="send-email-verification"),
     path('email-verification/<str:uuid>',EmailVerification.as_view(),name="email-verification"),
-    
 
-    # path('dj-rest-auth/', include('dj_rest_auth.urls')), 
+
+    # path('dj-rest-auth/', include('dj_rest_auth.urls')),
     # path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    # path('dj-rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),    
+    # path('dj-rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
     # path('dj-rest-auth/github/', GithubLogin.as_view(), name='github_login'),
     # path('dj-rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
 

@@ -1,22 +1,21 @@
-from typing_extensions import Required
-from django.db import models
-
 import uuid
+
+from django.conf import settings
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from typing_extensions import Required
 from versatileimagefield.fields import VersatileImageField
 
 # from django.contrib.auth import get_user_model
 # User = get_user_model()
 
-from django.conf import settings
 User = settings.AUTH_USER_MODEL
 
 
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
 
 class PasswordResetRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -42,15 +41,17 @@ class CustomUser(AbstractUser):
 	email_verified = models.BooleanField(default=False,null=True,blank=True)
 	first_name = None
 	last_name = None
-	
+
 	def __str__(self):
 		return self.username
-	
+
 	def get_connections_amount(self):
 		return self.connection.connected.all().count()
-	
+
 
 from .helpers import get_random_alphanumeric_string
+
+
 def get_upload_path(instance,filename):
 	ext = filename.split('.')[-1]
 	randomfilename = get_random_alphanumeric_string(20)
@@ -58,6 +59,7 @@ def get_upload_path(instance,filename):
 	return 'user/{}/profile/{}'.format(instance.user.id,resultfilename)
 
 from django.core.exceptions import ValidationError
+
 
 def file_size(value): # add this to some file where you can import it from
     limit = 8 * 1024 * 1024
@@ -91,10 +93,10 @@ class Profile(models.Model):
 class Connection(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	connected = models.ManyToManyField('self',blank=True)
-	
+
 	def __str__(self):
 		return str(self.id)
-	
+
 
 
 class Block(models.Model):

@@ -1,20 +1,23 @@
 import os
-from django.db.models.signals import post_save,m2m_changed,post_delete,pre_save
 
 from django.contrib.auth import get_user_model
+from django.db.models.signals import (m2m_changed, post_delete, post_save,
+                                      pre_save)
+
 User = get_user_model()
 
-from .models import *
-
-from .helpers import get_random_alphanumeric_string
+import logging
 
 from django.conf import settings
-
 from django.core.mail import send_mail
+from django.dispatch import receiver
 
+from .helpers import get_random_alphanumeric_string
+from .models import *
 from .tasks import *
 
-from django.dispatch import receiver
+logger = logging.getLogger(__name__)
+
 
 @receiver(post_save, sender=Verification, dispatch_uid="unique")
 def verificationSignal(sender,instance,created,**kwargs):
@@ -31,8 +34,9 @@ def verificationSignal(sender,instance,created,**kwargs):
                     app_name = "Testing"
                     subject = f'Verification from{app_name} App'
                     verification_url = instance.uuid
-                    message = f'Hi {instance.name} ,visit this link to verify your email address. {verification_url}'
+                    message = f'Hi {instance.user.profile.name} ,visit this link to verify your email address. {verification_url}'
                     send_email.delay(subject,message,recipient_list)
+                    logger.info("[Email verification] sent to user id = {}.".format(instance.user.id))
 
 
 @receiver(post_save,sender=PasswordResetRequest,dispatch_uid="unique")
@@ -43,6 +47,7 @@ def ForgotPasswordSignal(sender,instance,created,**kwargs):
         message = f'Hi {instance.user.profile.name} , This is your 4 digit verification code. {instance.code} . The code will expire in 10 minutes.'
         recipient_list = [instance.user.email,]
         send_email.delay(subject,message,recipient_list)
+        logger.info("[Forgot Password Verification Code Email] sent to user id = {}.".format(instance.user.id))
 
 
 
@@ -50,7 +55,7 @@ def ForgotPasswordSignal(sender,instance,created,**kwargs):
 def userMainSignal(sender,instance,created,**kwargs):
     # if user is created
     if created:
-        print("signal : create profile")
+        logger.info("User Created. id = {}.".format(instance.id))
         random_unique_string = str(get_random_alphanumeric_string(5)) + str(instance.id) + str(get_random_alphanumeric_string(5))
         # create profile
         profile = Profile.objects.create(
@@ -69,8 +74,9 @@ def userMainSignal(sender,instance,created,**kwargs):
             recipient_list = [instance.email,]
             app_name = "Testing"
             subject = f'Welcome to {app_name} App'
-            message = f'Hi {instance.name} ,thank you for registering in {app_name}.'
+            message = f'Hi {instance.profile.name} ,thank you for registering in {app_name}.'
             send_email.delay(subject,message,recipient_list)
+            logger.info("[Welcome Email] sent to user id = {}.".format(instance.id))
     # if user updated their account, send a notification email
     #if not created:
     else:
@@ -78,22 +84,22 @@ def userMainSignal(sender,instance,created,**kwargs):
             recipient_list = [instance.email,]
             app_name = "Testing"
             subject = f'{app_name} App'
-            message = f'Hi {instance.name} ,You have successfully updated your account in {app_name}.'
+            message = f'Hi {instance.profile.name} ,You have successfully updated your account in {app_name}.'
             send_email.delay(subject,message,recipient_list)
-        
-        # Password has been updated
-        if 'password' in instance.changed_fields:
-            recipient_list = [instance.email,]
-            app_name = "Testing"
-            subject = f'{app_name} App'
-            reset_password_url = 'http/localhost:3000/reset-password'
-            message = f'Hi {instance.name} , You have successfully changed your password. If it was not you , please reset your password. Visit this link {reset_password_url}'
-            send_email.delay(subject,message,recipient_list)
-        
+            logger.info("[User Updated Email] sent to user id = {}.".format(instance.id))
+
+        # Password has been updated, error !
+        # if 'password' in instance.changed_fields:
+        #     recipient_list = [instance.email,]
+        #     app_name = "Testing"
+        #     subject = f'{app_name} App'
+        #     reset_password_url = 'http/localhost:3000/reset-password'
+        #     message = f'Hi {instance.profile.name} , You have successfully changed your password. If it was not you , please reset your password. Visit this link {reset_password_url}'
+        #     send_email.delay(subject,message,recipient_list)
+
 
 @receiver(post_save, sender=Request, dispatch_uid="unique")
 def requestAction(sender,instance,created,**kwargs):
-    print("signal : requestAction")
     # TESTED = WORKS !
     # if user accept the friend request , user will be friend/connected with the request sender.
     # then the request will be deleted
@@ -163,7 +169,6 @@ def blockDeletedAction(sender,instance,*args,**kwargs):
 
 @receiver(post_delete, sender=Profile, dispatch_uid="unique")
 def auto_clear_files_on_delete(sender,instance,*args,**kwargs):
-    print("file handler signal is running")
     # delete filtered and sized cache images
     instance.profile_picture.delete_all_created_images()
     instance.poster_picture.delete_all_created_images()

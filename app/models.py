@@ -44,12 +44,12 @@ def file_size(value): # add this to some file where you can import it from
     limit = 8 * 1024 * 1024
     if value.size > limit:
         raise ValidationError('File too large. Size should not exceed 8 MiB.')
-    
+
 class PostMedia(models.Model):
 	post = models.ForeignKey(Post, on_delete=models.CASCADE)
 	image = VersatileImageField(blank=True,null=True,upload_to=get_upload_path,validators=[file_size])
 	time_creation = models.DateTimeField(auto_now_add=True,null=True,blank=True)
-	
+
 	def __str__(self):
 		return str(self.id)
 
@@ -128,7 +128,7 @@ class Like(models.Model):
 
 	def __str__(self):
 		return str(self.id)
-	
+
 	def get_natural_time(self):
 		return humanize.naturaltime(self.time_creation)
 

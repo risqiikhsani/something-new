@@ -48,7 +48,7 @@ class Post_Serializer(serializers.ModelSerializer):
             'likes_amount', 'comments_amount','shares_amount','liked','shared','saved','postmedia_set','delete_images_id']
         read_only_fields = ['user','postmedia_set']
         # extra_kwargs = [
-        #     'deleted_images_id':{'write_only':True}, 
+        #     'deleted_images_id':{'write_only':True},
         # ]
 
 
@@ -90,7 +90,7 @@ class Post_Serializer(serializers.ModelSerializer):
             b = PostMedia.objects.create(post=a,image=i)
             b.save()
         return a
-    
+
     def validate(self,data):
         limit = 8 * 1024 * 1024
         totalsize = 0

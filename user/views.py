@@ -1,37 +1,36 @@
 
 
-from .serializers import User_Serializer, User_Simple_Serializer
-from .serializers import Request_Serializer
-from .serializers import Connection_Serializer
-from .serializers import my_user_serializer,my_profile_serializer
-from .serializers import Relationship_Serializer
-from django_filters.rest_framework import DjangoFilterBackend
 from http import server
 from os import stat
 
-from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.db.models import Q
-from django.core.exceptions import ValidationError
-
-from rest_framework import generics, mixins, response, decorators, permissions, status, viewsets
-from rest_framework.response import Response
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from rest_framework.decorators import api_view, action
-from rest_framework.reverse import reverse
+from django.conf import settings
 # Token
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
+from django.core.exceptions import ValidationError
+from django.db.models import Q
+from django.shortcuts import get_list_or_404, get_object_or_404, render
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (decorators, generics, mixins, permissions,
+                            response, status, viewsets)
+from rest_framework.decorators import action, api_view
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
-from .permissions import IsOwnerOrReadOnly
 from .models import *
-from django.conf import settings
+from .permissions import IsOwnerOrReadOnly
+from .serializers import (Connection_Serializer, Relationship_Serializer,
+                          Request_Serializer, User_Serializer,
+                          User_Simple_Serializer, my_profile_serializer,
+                          my_user_serializer)
+
 # User = settings.AUTH_USER_MODEL
 
-from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from something.pagination import MycustomPagination
+
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -68,7 +67,7 @@ class user_relationship(generics.RetrieveUpdateAPIView):
 		queryset = self.get_queryset().filter(user=self.request.user)
 		obj = get_object_or_404(queryset, to_user=User.objects.get(id=self.kwargs["pk"]))
 		return obj
-	
+
 class my_user(generics.RetrieveUpdateAPIView):
 	parser_classes = (JSONParser, MultiPartParser, FormParser)
 	serializer_class = my_user_serializer
@@ -79,13 +78,13 @@ class my_user(generics.RetrieveUpdateAPIView):
 		queryset = self.get_queryset()
 		obj = get_object_or_404(queryset, id=self.request.user.id)
 		return obj
-	
-	
+
+
 class my_profile(generics.RetrieveUpdateAPIView):
 	parser_classes = (JSONParser, MultiPartParser, FormParser)
 	serializer_class = my_profile_serializer
 	queryset = Profile.objects.all()
-	
+
 	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
 	def get_object(self):
 		queryset = self.get_queryset()
@@ -93,7 +92,7 @@ class my_profile(generics.RetrieveUpdateAPIView):
 		return obj
 
 
- 
+
 class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 # https://stackoverflow.com/questions/31785966/django-rest-framework-turn-on-pagination-on-a-viewset-like-modelviewset-pagina
 # class ConnectionViewSet(mixins.ListModelMixin,viewsets.GenericViewSet):
@@ -109,7 +108,7 @@ class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 		return Response(serializer.data)
 
 
-	
+
 	@action(detail=True)
 	def remove_connection(self,request,pk=None):
 		queryset = self.get_queryset()
@@ -118,7 +117,7 @@ class ConnectionViewSet(viewsets.ReadOnlyModelViewSet):
 		my_connection.connected.remove(connection)
 		return Response("connection is successfully removed",status=status.HTTP_200_OK)
 
-		
+
 class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 	serializer_class = Request_Serializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
@@ -197,7 +196,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 		print(obj)
 		serializer = Connection_Serializer(obj,many=True,context={'request': request})
 		return Response(serializer.data)
-	
+
 
 
 # class ConnectionList(mixins.ListModelMixin, generics.GenericAPIView):
@@ -255,6 +254,6 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 # 	def get(self, request, *args, **kwargs):
 # 		return self.retrieve(request, *args, **kwargs)
-	
+
 # 	def delete(self, request, *args, **kwargs):
 # 		return self.destroy(request, *args, **kwargs)

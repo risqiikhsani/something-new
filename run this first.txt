@@ -5,13 +5,13 @@ https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#using-cel
 https://medium.com/@techWithAditya/building-scalable-applications-with-django-celery-and-rabbitmq-a-step-by-step-guide-fc58bccc8cad
 celery -A something.celery worker --loglevel=debug --concurrency=4
 
-to run redis 
+to run redis
 sudo docker run -p 6379:6379 -d redis:5
 
-if use posgres , run this 
+if use posgres , run this
 sudo docker-compose up -d
 
-port 5432 is used? 
+port 5432 is used?
 systemctl status postgresql
 systemctl stop postgresql
 or
@@ -28,8 +28,13 @@ https://medium.com/@benjamin.pereto/microservices-with-django-events-with-publis
 run test
 
 python manage.py test --noinput
-if a test run is forcefully interrupted, the test database may not be destroyed. On the next run, you’ll be asked whether you want to reuse or destroy the database. 
-Use the test --noinput option to suppress that prompt and automatically destroy the database. 
+if a test run is forcefully interrupted, the test database may not be destroyed. On the next run, you’ll be asked whether you want to reuse or destroy the database.
+Use the test --noinput option to suppress that prompt and automatically destroy the database.
 This can be useful when running tests on a continuous integration server where tests may be interrupted by a timeout, for example.
 
 
+
+pre-commit (is code checking , the tools used is seperated from the pip)
+pre-commit install
+pre-commit run --all-files
+git commit (will trigger the run all files)

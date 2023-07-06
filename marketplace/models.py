@@ -18,7 +18,7 @@ class Category(models.Model):
 
 #     def __str__(self):
 #         return self.name
-    
+
 
 class Item(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -33,7 +33,7 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 from .helpers import get_random_alphanumeric_string
 def get_upload_path(instance,filename):
@@ -48,7 +48,7 @@ def file_size(value): # add this to some file where you can import it from
     limit = 8 * 1024 * 1024
     if value.size > limit:
         raise ValidationError('File too large. Size should not exceed 8 MiB.')
-    
+
 class Photo(models.Model):
     item = models.ForeignKey(Item,on_delete=models.CASCADE)
     photo = VersatileImageField(
@@ -58,7 +58,6 @@ class Photo(models.Model):
 		blank=True
     )
     is_background = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return str(self.id)
-    

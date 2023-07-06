@@ -1,37 +1,29 @@
-from .serializers_auth import Login_Serializer
-from .serializers_auth import ChangePassword_Serializer
-from versatileimagefield.serializers import VersatileImageFieldSerializer
-from .serializers_auth import User_Simple_Serializer
-from .serializers_auth import Register_Serializer
 from http import server
 from os import stat
 from urllib.parse import urlencode
 
-from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.db.models import Q
-from django.urls import reverse
-from django.core.exceptions import ValidationError
-from django.shortcuts import redirect
-from rest_framework import generics, mixins, response, decorators, permissions, status
-from rest_framework.response import Response
-from rest_framework import status, serializers
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-
-
 # Token
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
+from django.core.exceptions import ValidationError
+from django.db.models import Q
+from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
+                              render)
+from django.urls import reverse
+from rest_framework import (decorators, generics, mixins, permissions,
+                            response, serializers, status)
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 
-
-from .permissions import IsOwnerOrReadOnly
 from .models import *
+from .permissions import IsOwnerOrReadOnly
+from .serializers_auth import (ChangePassword_Serializer, Login_Serializer,
+                               Register_Serializer, User_Simple_Serializer)
 
-
-from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from .services import google_get_access_token
-from .services import google_get_user_info
+from .services import google_get_access_token, google_get_user_info
 
 # redirect this url from google credential redirect uri
 
@@ -82,7 +74,7 @@ from .services import google_get_user_info
 #         # # We don't have a sign-up flow.
 #         # user, _ = User.objects.get_or_create(email=user_data['email'])
 
-        
+
 #         # login_url = f'{settings.BASE_FRONTEND_LOGIN_URL}'
 #         # params = urlencode({
 #         #     'access_token': accessToken,

@@ -1,4 +1,4 @@
-#!/home/bismillah/Documents/project/django/something-new/myenv/bin/python3
+#!/home/bismillah/Documents/project/django/something-new/myenv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

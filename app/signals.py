@@ -72,7 +72,7 @@ def LikeNotification(sender, instance, created, **kwargs):
     else:
         return None
 
-    if created and user.id is not instance.user.id: 
+    if created and user.id is not instance.user.id:
         print("like notification signal is running")
         Notification.objects.create(
             user=user,

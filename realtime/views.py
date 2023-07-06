@@ -30,16 +30,16 @@ class NotificationList(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.notification_set.all().order_by('-time_creation')
-    
+
 
 from .serializers import ChatRoom_Serializer
 class ChatRoomList(generics.ListAPIView):
     serializer_class = ChatRoom_Serializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         # https://docs.djangoproject.com/en/4.1/topics/db/aggregation/
-        return ChatRoom.objects.all().filter(user=self.request.user).annotate(last_chat_date=Max('chat__time_creation')).order_by('-last_chat_date')    
+        return ChatRoom.objects.all().filter(user=self.request.user).annotate(last_chat_date=Max('chat__time_creation')).order_by('-last_chat_date')
 
 # class ChatRoomList(generics.GenericAPIView):
 #     serializer_class = ChatRoom_Serializer
@@ -47,7 +47,7 @@ class ChatRoomList(generics.ListAPIView):
 
 #     def get_queryset(self):
 #         return ChatRoom.objects.all().filter(user=self.request.user).annotate(last_chat_date=Max('chat__time_creation')).order_by('-last_chat_date')
-    
+
 #     def get(self,request,*args,**kwargs):
 #         queryset = self.get_queryset()
 #         serializer = self.get_serializer(queryset,many=True,context={'request':request})
@@ -60,7 +60,7 @@ class GetOrCreateChatRoom(generics.GenericAPIView):
 
     def get_queryset(self):
         return get_object_or_404(User, id=self.kwargs["user_id"])
-    
+
     def get(self,request,*args,**kwargs):
         queryset = self.get_queryset()
         try:
@@ -79,7 +79,7 @@ class GetOrCreateChatRoom(generics.GenericAPIView):
         return Response(data,status=status.HTTP_201_CREATED)
 
 
-    
+
 
 # class NotificationList(mixins.ListModelMixin, generics.GenericAPIView):
 #     serializer_class = Notification_Serializer
@@ -126,18 +126,18 @@ class GetOrCreateChatRoom(generics.GenericAPIView):
 
 #     def get_queryset(self):
 #         return self.request.user.notification_set.all().order_by('-time_creation')
-    
+
 
 # from .serializers import ChatRoom_Serializer
 # class ChatRoomList(generics.ListAPIView):
 #     serializer_class = ChatRoom_Serializer
 #     permission_classes = [permissions.IsAuthenticated]
-    
+
 
 #     def get_queryset(self):
 #         # https://docs.djangoproject.com/en/4.1/topics/db/aggregation/
-#         return ChatRoom.objects.all().filter(user=self.request.user).annotate(last_chat_date=Max('chat__time_creation')).order_by('-last_chat_date')    
-    
+#         return ChatRoom.objects.all().filter(user=self.request.user).annotate(last_chat_date=Max('chat__time_creation')).order_by('-last_chat_date')
+
 
 # class GetOrCreateChatRoom(generics.GenericAPIView):
 
@@ -146,7 +146,7 @@ class GetOrCreateChatRoom(generics.GenericAPIView):
 
 #     def get_queryset(self):
 #         return get_object_or_404(User, id=self.kwargs["user_id"])
-    
+
 #     def get(self,request,*args,**kwargs):
 #         queryset = self.get_queryset()
 #         try:
@@ -165,7 +165,7 @@ class GetOrCreateChatRoom(generics.GenericAPIView):
 #         return Response(data,status=status.HTTP_201_CREATED)
 
 
-    
+
 
 # # class NotificationList(mixins.ListModelMixin, generics.GenericAPIView):
 # #     serializer_class = Notification_Serializer

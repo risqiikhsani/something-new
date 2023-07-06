@@ -142,7 +142,7 @@ class ChatConsumer(WebsocketConsumer):
         a = ChatRoom.objects.get(id=self.room_name)
         if user not in a.user.all():
             self.close()
-        
+
         self.room_group_name = "chatroom_%s" % self.room_name
 
         # Join room group
@@ -160,7 +160,7 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     # Menerima message dari websocket , kemudian kirim ke group channel layer
-    
+
     def receive(self, text_data):
         print("received text_data = " + text_data+" in "+self.channel_name)
         text_data_json = json.loads(text_data)
@@ -196,7 +196,7 @@ class ChatConsumer(WebsocketConsumer):
             case _:
                 pass
 
-        
+
 
     # Receive message from room group
     def chat_message(self, event):
@@ -217,9 +217,9 @@ class ChatConsumer(WebsocketConsumer):
             "type": "chat_notification_ws",
         }))
 
-    
 
-    
+
+
 
 ####################################################################################################
 

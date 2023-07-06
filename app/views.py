@@ -206,7 +206,7 @@ class LikeHandler(generics.GenericAPIView):
             elif 'comment_id' in self.kwargs:
                 return Response(Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
             elif 'reply_id' in self.kwargs:
-                return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)     
+                return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
         else:
             if 'post_id' in self.kwargs:
                 like = Like(user=self.request.user,
@@ -246,7 +246,7 @@ class SaveHandler(generics.GenericAPIView):
         if self.get_queryset().save_set.filter(user=self.request.user).exists():
             queryset = self.get_queryset().save_set.filter(user=self.request.user).first()
             queryset.delete()
-            return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data, status=status.HTTP_200_OK)     
+            return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data, status=status.HTTP_200_OK)
         else:
             if 'post_id' in self.kwargs:
                 save = Save(user=self.request.user,

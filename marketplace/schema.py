@@ -15,23 +15,23 @@ class Query(graphene.ObjectType):
 
     def resolve_all_categories(root,info):
         return Category.objects.all()
-    
+
     def resolve_get_category(root,info,id):
         try:
             return Category.objects.get(id=id)
         except Category.DoesNotExist:
-            return None        
+            return None
 
-        
+
     def resolve_all_items(root,info):
         return Item.objects.all()
-    
+
     def resolve_get_item(root,info,id):
         try:
             return Item.objects.get(id=id)
         except Item.DoesNotExist:
             return None
-        
+
     def resolve_all_photos(root,info,item):
         try:
             a = Item.objects.get(id=item)
@@ -51,7 +51,7 @@ class CreateCategory(graphene.Mutation):
         a = Category(name=name)
         a.save()
         return CreateCategory(category=a)
-    
+
 class UpdateCategory(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -65,7 +65,7 @@ class UpdateCategory(graphene.Mutation):
         a.name = name
         a.save()
         return UpdateCategory(category=a)
-    
+
 class DeleteCategory(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -94,7 +94,7 @@ class Mutation(graphene.ObjectType):
 # class QuestionType(DjangoObjectType):
 #     class Meta:
 #         model = Question
-        
+
 # class QuestionMutation(graphene.Mutation):
 #     class Arguments:
 #         # The input arguments for this mutation

@@ -22,7 +22,7 @@ class Notification(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
     def get_natural_time(self):
         return humanize.naturaltime(self.time_creation)
 
@@ -41,7 +41,7 @@ class Client(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
 class ClientSocketData(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
     last_read_id_in_server = models.IntegerField(default=0)
@@ -50,7 +50,7 @@ class ClientSocketData(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
 class ChatRoom(models.Model):
     TYPE_CHOICES = [
         ("twoperson","twoperson"),
@@ -62,7 +62,7 @@ class ChatRoom(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
     @property
     def get_last_chat_date(self):
         try:
@@ -71,7 +71,7 @@ class ChatRoom(models.Model):
             return self.time_creation
 
 
-    
+
 class GroupChatRoom(models.Model):
     time_creation = models.DateTimeField(auto_now_add=True,null=True)
     generated_link = models.CharField(null=True,blank=True,max_length=100)
@@ -91,8 +91,6 @@ class Chat(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
     def get_natural_time(self):
         return humanize.naturaltime(self.time_creation)
-
-    

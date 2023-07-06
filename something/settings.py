@@ -38,6 +38,8 @@ SECRET_KEY =  str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', 0)))
 
+APP_IS_CONTAINERIZED = bool(int(os.getenv('APP_IS_CONTAINERIZED', 0)))
+
 BASE_BACKEND_URL = str(os.getenv('BASE_BACKEND_URL'))
 BASE_FRONTEND_URL = str(os.getenv('BASE_FRONTEND_URL'))
 BASE_FRONTEND_LOGIN_URL = str(os.getenv('BASE_FRONTEND_LOGIN_URL'))
@@ -263,10 +265,10 @@ else:
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
 # Enable WhiteNoise's GZip compression of static assets.
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -319,6 +321,7 @@ VERSATILEIMAGEFIELD_SETTINGS = {
     'progressive_jpeg': False
 }
 
+
 VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
     'image_gallery': [
         ('gallery_large', 'crop__800x450'),
@@ -359,8 +362,57 @@ RABBITMQ_PASSWORD = str(os.getenv('RABBITMQ_PASSWORD'))
 BROKER_URL = 'amqp://'+RABBITMQ_USERNAME+':'+RABBITMQ_PASSWORD+'@'+RABBITMQ_HOST+':'+RABBITMQ_PORT+'//'
 CELERY_RESULT_BACKEND = 'rpc://'
 
+#Google auth
 GOOGLE_OAUTH2_CLIENT_ID = str(os.getenv('GOOGLE_OAUTH2_CLIENT_ID'))
 GOOGLE_OAUTH2_CLIENT_SECRET = str(os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET'))
 
+import logging,colorlog
+
+#https://docs.djangoproject.com/en/4.2/topics/logging/#configuring-logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {name} {message}',
+            'style': '{',
+        },
+        'verbose_colored': {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s %(levelname)-8s %(asctime)s %(process)s --- "
+            "%(lineno)-8s [%(name)s] %(funcName)-24s : %(message)s",
+            "log_colors": {
+                "DEBUG": "blue",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose_colored' if DEBUG else 'verbose',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/debug.log') if DEBUG else os.path.join(BASE_DIR, 'log/production.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 
+
+#https://docs.djangoproject.com/en/4.2/ref/settings/#std-setting-ADMINS
+ADMINS = [("Risqi", "risqiikhsani12@gmail.com"),]

@@ -9,14 +9,14 @@ class ForgotPassword(generics.GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.validated_data['email']
             user = get_object_or_404(User, email=email)
-            
+
             # Generate a 4-digit verification code
             verification_code = str(randint(1000, 9999))
-            
+
             # Save the verification code in the user's profile or any other suitable place
             user.profile.verification_code = verification_code
             user.profile.save()
-            
+
             # Send email with the verification code
             app_name = "Testing"
             name = user.profile.name
@@ -25,7 +25,7 @@ class ForgotPassword(generics.GenericAPIView):
             email_from = settings.EMAIL_HOST_USER
             recepient_list = [user.email,]
             send_mail(subject, message, email_from, recepient_list, fail_silently=False)
-            
+
             return Response({"message": "Reset Password Guide has been sent to email"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -52,7 +52,7 @@ class ForgotPasswordConfirm(generics.GenericAPIView):
                 user.profile.save()
             except User.DoesNotExist:
                 return Response({'detail': 'Invalid verification code.'}, status=status.HTTP_400_BAD_REQUEST)
-            
+
             return Response({"message": "Password updated successfully"}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

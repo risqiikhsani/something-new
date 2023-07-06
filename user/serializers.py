@@ -1,14 +1,12 @@
 
 
 
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from versatileimagefield.serializers import VersatileImageFieldSerializer
 
 from .models import *
 
-
-from versatileimagefield.serializers import VersatileImageFieldSerializer
-
-from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Profile_Simple_Serializer(serializers.ModelSerializer):
@@ -32,7 +30,7 @@ class Profile_Simple_Serializer(serializers.ModelSerializer):
 
 class User_Simple_Serializer(serializers.ModelSerializer):
 	profile = Profile_Simple_Serializer()
-	
+
 	class Meta:
 		model = CustomUser
 		fields = ['id','profile']
@@ -145,7 +143,7 @@ class Relationship_Serializer(serializers.ModelSerializer):
 	class Meta:
 		model = Relationship
 		exclude = ('user','to_user',)
-		
+
 class Connection_Serializer(serializers.ModelSerializer):
 	user = User_Simple_Serializer()
 	relationship = serializers.SerializerMethodField()

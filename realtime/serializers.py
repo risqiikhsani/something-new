@@ -31,7 +31,7 @@ class Notification_Serializer(serializers.ModelSerializer):
 
 class Chat_Serializer(serializers.ModelSerializer):
     sender = User_Simple_Serializer(required=False)
-    
+
     class Meta:
         model = Chat
         fields = ['id','sender','room','text','time_creation','time_update','reply_from','forwarded',]
@@ -46,21 +46,20 @@ class ChatRoom_Serializer(serializers.ModelSerializer):
         fields = ['id','type','time_creation','last_chat','display']
         order_by = ['']
 
-    
+
     def get_last_chat(self,obj):
         try:
             a = obj.chat_set.all().latest('id')
             return Chat_Serializer(instance=a,context={'request':self.context['request']}).data
         except Chat.DoesNotExist:
-            return None    
-        
+            return None
+
     def get_display(self,obj):
         if obj.type == "group":
             return None
         else:
             user = obj.user.all().exclude(id=self.context['request'].user.id).latest('id')
             return User_Simple_Serializer(instance=user,context={'request':self.context['request']}).data
-        
+
     # def get_websocket_group_name(self,obj):
     #     return "chatroom_%s" % obj.id
-        

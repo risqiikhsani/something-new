@@ -1,12 +1,13 @@
 
 
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .models import *
 
-from django.contrib.auth import get_user_model
 User = get_user_model()
 from versatileimagefield.serializers import VersatileImageFieldSerializer
+
 
 class Profile_Simple_Serializer(serializers.ModelSerializer):
 	profile_picture = VersatileImageFieldSerializer(
@@ -22,7 +23,7 @@ class Profile_Simple_Serializer(serializers.ModelSerializer):
 
 class User_Simple_Serializer(serializers.ModelSerializer):
 	profile = Profile_Simple_Serializer()
-	
+
 	class Meta:
 		model = CustomUser
 		fields = ['id','profile']

@@ -17,7 +17,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         # Check permissions for write request , or
         # Write permissions are only allowed to the owner of the snippet.
         return obj.user == request.user
-    
+
 
 # class IsStaffOrReadOnly(permissions.BasePermission):
 #     """
@@ -35,4 +35,3 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 #         # Check permissions for write request , or
 #         # Write permissions are only allowed to the owner of the snippet.
 #         return obj.user == request.user
-    

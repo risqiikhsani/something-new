@@ -1,15 +1,11 @@
 import logging
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.urls import reverse
 
-from django.core.mail import send_mail
-
-from django.contrib.auth import get_user_model
-
 from something.celery import app
-
-from django.conf import settings
-
 
 
 @app.task
