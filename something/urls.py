@@ -18,8 +18,8 @@ from django.urls import path,include
 
 import logging
 logger = logging.getLogger(__name__)
-logger.debug('user entered site')
 
+logger.info('user entered site')
 
 
 urlpatterns = [

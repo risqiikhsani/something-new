@@ -36,7 +36,8 @@ def verificationSignal(sender,instance,created,**kwargs):
                     verification_url = instance.uuid
                     message = f'Hi {instance.user.profile.name} ,visit this link to verify your email address. {verification_url}'
                     send_email.delay(subject,message,recipient_list)
-                    logger.info("[Email verification] sent to user id = {}.".format(instance.user.id))
+                    logger.info('[Email verification email] is sent to user_id={}'.format(instance.user.id))
+                    
 
 
 @receiver(post_save,sender=PasswordResetRequest,dispatch_uid="unique")
@@ -47,7 +48,8 @@ def ForgotPasswordSignal(sender,instance,created,**kwargs):
         message = f'Hi {instance.user.profile.name} , This is your 4 digit verification code. {instance.code} . The code will expire in 10 minutes.'
         recipient_list = [instance.user.email,]
         send_email.delay(subject,message,recipient_list)
-        logger.info("[Forgot Password Verification Code Email] sent to user id = {}.".format(instance.user.id))
+        logger.info('[password reset request verification email] is sent to user_id={}'.format(instance.user.id))
+        
 
 
 
@@ -76,7 +78,8 @@ def userMainSignal(sender,instance,created,**kwargs):
             subject = f'Welcome to {app_name} App'
             message = f'Hi {instance.profile.name} ,thank you for registering in {app_name}.'
             send_email.delay(subject,message,recipient_list)
-            logger.info("[Welcome Email] sent to user id = {}.".format(instance.id))
+            logger.info('[Welcome to app email] is sent to user_id={}'.format(instance.id))
+            
     # if user updated their account, send a notification email
     #if not created:
     else:
@@ -86,7 +89,7 @@ def userMainSignal(sender,instance,created,**kwargs):
             subject = f'{app_name} App'
             message = f'Hi {instance.profile.name} ,You have successfully updated your account in {app_name}.'
             send_email.delay(subject,message,recipient_list)
-            logger.info("[User Updated Email] sent to user id = {}.".format(instance.id))
+            logger.info('[user updated notification email] is sent to user_id={}'.format(instance.id))
 
         # Password has been updated, error !
         # if 'password' in instance.changed_fields:

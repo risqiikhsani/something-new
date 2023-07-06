@@ -383,7 +383,7 @@ LOGGING = {
             "%(lineno)-8s [%(name)s] %(funcName)-24s : %(message)s",
             "log_colors": {
                 "DEBUG": "blue",
-                "INFO": "white",
+                "INFO": "green",
                 "WARNING": "yellow",
                 "ERROR": "red",
                 "CRITICAL": "bold_red",
@@ -399,7 +399,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/debug.log') if DEBUG else os.path.join(BASE_DIR, 'log/production.log'),
+            'filename': os.path.join(BASE_DIR, 'log/debug.log'),
             'formatter': 'verbose',
         },
     },
