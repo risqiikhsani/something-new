@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (decorators, generics, mixins, permissions,
-                            response, status, viewsets)
+							response, status, viewsets)
 from rest_framework.decorators import action, api_view
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
@@ -21,9 +21,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import *
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (Connection_Serializer, Relationship_Serializer,
-                          Request_Serializer, User_Serializer,
-                          User_Simple_Serializer, my_profile_serializer,
-                          my_user_serializer)
+						  Request_Serializer, User_Serializer,
+						  User_Simple_Serializer, my_profile_serializer,
+						  my_user_serializer)
 
 # User = settings.AUTH_USER_MODEL
 
@@ -43,53 +43,47 @@ def api_root(request, format=None):
 # https://www.django-rest-framework.org/tutorial/3-class-based-views/
 
 
-class UserList(mixins.ListModelMixin, generics.GenericAPIView):
-	serializer_class = User_Simple_Serializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-	queryset = User.objects.all()
 
-	def get(self, request, *args, **kwargs):
-		return self.list(request, *args, **kwargs)
-
+class UserList(generics.ListAPIView):
+    serializer_class = User_Simple_Serializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = User.objects.all()
 
 class UserDetail(generics.RetrieveAPIView):
-	queryset = User.objects.all()
-	serializer_class = User_Serializer
+    queryset = User.objects.all()
+    serializer_class = User_Serializer
 
-class user_relationship(generics.RetrieveUpdateAPIView):
-	parser_classes = (JSONParser, MultiPartParser, FormParser)
-	serializer_class = Relationship_Serializer
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-	queryset = Relationship.objects.all()
+class UserRelationship(generics.RetrieveUpdateAPIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    serializer_class = Relationship_Serializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    queryset = Relationship.objects.all()
 
-	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
-	def get_object(self):
-		queryset = self.get_queryset().filter(user=self.request.user)
-		obj = get_object_or_404(queryset, to_user=User.objects.get(id=self.kwargs["pk"]))
-		return obj
+    def get_object(self):
+        queryset = self.get_queryset().filter(user=self.request.user)
+        to_user = get_object_or_404(User, id=self.kwargs["pk"])
+        obj = get_object_or_404(queryset, to_user=to_user)
+        return obj
 
-class my_user(generics.RetrieveUpdateAPIView):
-	parser_classes = (JSONParser, MultiPartParser, FormParser)
-	serializer_class = my_user_serializer
-	queryset = User.objects.all()
+class MyUser(generics.RetrieveUpdateAPIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    serializer_class = my_user_serializer
+    queryset = User.objects.all()
 
-	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
-	def get_object(self):
-		queryset = self.get_queryset()
-		obj = get_object_or_404(queryset, id=self.request.user.id)
-		return obj
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, id=self.request.user.id)
+        return obj
 
+class MyProfile(generics.RetrieveUpdateAPIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    serializer_class = my_profile_serializer
+    queryset = Profile.objects.all()
 
-class my_profile(generics.RetrieveUpdateAPIView):
-	parser_classes = (JSONParser, MultiPartParser, FormParser)
-	serializer_class = my_profile_serializer
-	queryset = Profile.objects.all()
-
-	# note = set get_object to exclude lookup_url when calling RetrieveAPIView
-	def get_object(self):
-		queryset = self.get_queryset()
-		obj = get_object_or_404(queryset, user=self.request.user)
-		return obj
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, user=self.request.user)
+        return obj
 
 
 
@@ -156,46 +150,69 @@ class RequestViewSet(viewsets.ReadOnlyModelViewSet):
 			return Response("sucessfully decline request",status=status.HTTP_200_OK)
 		return Response("UNAUTHORIZED",status=status.HTTP_401_UNAUTHORIZED)
 
+
+	
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	serializer_class = User_Serializer
 
 	def get_queryset(self):
 		return User.objects.all()
 
-	@action(detail=True)
-	def remove_connection(self,request,pk=None):
-		user = get_object_or_404(User,pk=pk)
-		my_c = get_object_or_404(Connection,user=self.request.user)
-		their_c = get_object_or_404(Connection,user=user)
+	def get_user(self, pk):
+		return get_object_or_404(User, pk=pk)
+
+	def get_connection(self, user):
+		return get_object_or_404(Connection, user=user)
+
+	def get_request(self, user):
+		return get_object_or_404(Request, user=user, sender=self.request.user)
+
+	@action(detail=True,methods=['get'])	
+	def get_user_detail(self,request,pk=None):
+		user = self.get_user(pk)
+		serializer = self.get_serializer(user)
+		return Response(serializer.data,status=status.HTTP_200_OK )
+
+	@action(detail=True, methods=['get'])
+	def remove_connection(self, request, pk=None):
+		user = self.get_user(pk)
+		my_c = self.get_connection(self.request.user)
+		their_c = self.get_connection(user)
+
 		if their_c in my_c.connected.all():
 			my_c.connected.remove(their_c)
-			return Response("request has been sent",status=status.HTTP_201_CREATED)
+			return Response({"message": "Request has been sent"}, status=status.HTTP_201_CREATED)
 		else:
-			return Response("failed, user wasn't connected",status=status.HTTP_404_NOT_FOUND)
+			return Response({"message": "Failed, user wasn't connected"}, status=status.HTTP_404_NOT_FOUND)
 
-	@action(detail=True)
-	def send_request(self,request,pk=None):
-		user = get_object_or_404(User, pk=pk)
-		obj, created = Request.objects.get_or_create(user=user, sender=self.request.user )
-		if created == False:
-			return Response("failed , request already exists",status=status.HTTP_404_NOT_FOUND)
-		return Response("request has been sent",status=status.HTTP_201_CREATED)
+	@action(detail=True, methods=['get'])
+	def send_request(self, request, pk=None):
+		user = self.get_user(pk)
+		obj, created = Request.objects.get_or_create(user=user, sender=self.request.user)
 
-	@action(detail=True)
-	def cancel_sent_request(self,request,pk=None):
-		user = get_object_or_404(User, pk=pk)
-		obj = Request.objects.get(user=user, sender=self.request.user)
-		if not obj:
-			return Response("failed, request isn't exists",status=status.HTTP_404_NOT_FOUND)
-		obj.delete()
-		return Response("successfully cancel the request",status=status.HTTP_200_OK)
+		if not created:
+			return Response({"message": "Failed, request already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
-	def user_connection_list(self,request,pk=None):
-		user = get_object_or_404(User, pk=pk)
-		obj = user.connection.connected.all()
-		print(obj)
+		return Response({"message": "Request has been sent"}, status=status.HTTP_201_CREATED)
+
+	@action(detail=True, methods=['get'])
+	def cancel_sent_request(self, request, pk=None):
+		user = self.get_user(pk)
+
+		try:
+			obj = self.get_request(user)
+			obj.delete()
+			return Response({"message": "Successfully canceled the request"}, status=status.HTTP_200_OK)
+		except Request.DoesNotExist:
+			return Response({"message": "Failed, request doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+
+	@action(detail=True, methods=['get'])
+	def user_connection_list(self, request, pk=None):
+		user = self.get_user(pk)
+		obj = self.get_connection(user).connected.all()
 		serializer = Connection_Serializer(obj,many=True,context={'request': request})
-		return Response(serializer.data)
+		return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

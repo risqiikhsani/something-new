@@ -15,7 +15,7 @@ app = Celery('something')
 app.config_from_object('django.conf:settings')
 
 
-
+#https://siddharth-pant.medium.com/the-missing-how-to-for-celery-logging-85e21f0231de
 @setup_logging.connect
 def config_loggers(*args, **kwargs):
     from logging.config import dictConfig  # noqa

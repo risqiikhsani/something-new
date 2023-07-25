@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     # 'daphne', ## this will use ASGI version 4
     # in order to use 'daphne' intead of 'channels' , reinstall the latest pip channels_redis version
     # but there's gonna be some error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
+    'drf_spectacular',
     'graphene_django',
     'phonenumber_field',
     'marketplace',
@@ -116,8 +117,18 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.MultiPartRenderer',
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.TemplateHTMLRenderer'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS':'drf_spectacular.openapi.AutoSchema',
+
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
 
 # If we didn’t specify the target schema in the urls.ply, we can do so here using
 # GRAPHENE = {
@@ -369,6 +380,7 @@ GOOGLE_OAUTH2_CLIENT_SECRET = str(os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET'))
 import logging,colorlog
 
 #https://docs.djangoproject.com/en/4.2/topics/logging/#configuring-logging
+#https://siddharth-pant.medium.com/the-only-concise-guide-to-django-logging-e0a305ddbf52
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

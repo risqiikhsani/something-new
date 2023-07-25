@@ -15,20 +15,38 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from rest_framework.schemas import get_schema_view
 
 import logging
 logger = logging.getLogger(__name__)
 
 logger.info('user entered site')
 
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-urlpatterns = [
+urlpatterns_docs = [
+    # YOUR PATTERNS
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/docs_swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/docs_redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/schema/openapi/', get_schema_view(
+        title="Your Project",
+        description="API for all things …",
+        version="1.0.0"
+    ), name='openapi-schema'),
+]
+
+
+urlpatterns_api = [
     path('admin/', admin.site.urls),
     path('api/',include('user.urls')),
     path('api/app/',include('app.urls')),
     path('api/realtime/',include('realtime.urls')),
     path('api/marketplace/',include('marketplace.urls')),
 ]
+
+urlpatterns = urlpatterns_docs + urlpatterns_api
 
 
 from django.conf.urls.static import static

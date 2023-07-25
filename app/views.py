@@ -18,6 +18,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 # Token
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -187,7 +188,7 @@ class LikeList(mixins.ListModelMixin, generics.GenericAPIView):
 #     def list(self,request,*args,**kwargs):
 
 
-class LikeHandler(generics.GenericAPIView):
+class LikeHandler(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
@@ -198,6 +199,7 @@ class LikeHandler(generics.GenericAPIView):
         elif 'reply_id' in self.kwargs:
             return Reply.objects.get(id=self.kwargs['reply_id'])
     def get(self,request,*args,**kwargs):
+        # if user has liked the post/comment/reply , do this
         if self.get_queryset().like_set.filter(user=self.request.user).exists():
             queryset = self.get_queryset().like_set.filter(user=self.request.user).first()
             queryset.delete()
@@ -207,6 +209,7 @@ class LikeHandler(generics.GenericAPIView):
                 return Response(Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
             elif 'reply_id' in self.kwargs:
                 return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+        # otherwise
         else:
             if 'post_id' in self.kwargs:
                 like = Like(user=self.request.user,
@@ -237,20 +240,26 @@ class SaveList(mixins.ListModelMixin, generics.GenericAPIView):
 
 class SaveHandler(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = Post_Serializer
 
-    def get_queryset(self):
+    def get_object(self):
+        queryset = Post.objects.all()
         if 'post_id' in self.kwargs:
-            return Post.objects.get(id=self.kwargs['post_id'])
+            return get_object_or_404(queryset, id=self.kwargs['post_id'])
 
-    def get(self,request,*args,**kwargs):
-        if self.get_queryset().save_set.filter(user=self.request.user).exists():
-            queryset = self.get_queryset().save_set.filter(user=self.request.user).first()
-            queryset.delete()
-            return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data, status=status.HTTP_200_OK)
+    def perform_save(self, queryset):
+        save, created = Save.objects.get_or_create(user=self.request.user, post=queryset)
+        if not created:
+            save.delete()
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_object()
+        save_queryset = queryset.save_set.filter(user=self.request.user)
+
+        if save_queryset.exists():
+            save_queryset.first().delete()
         else:
-            if 'post_id' in self.kwargs:
-                save = Save(user=self.request.user,
-                            post=self.get_queryset())
-                save.save()
+            self.perform_save(queryset)
 
-            return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(instance=queryset, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

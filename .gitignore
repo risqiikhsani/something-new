@@ -25,3 +25,5 @@ media/
 # Virtual environment
 myenv
 myenv/
+
+schema.yml

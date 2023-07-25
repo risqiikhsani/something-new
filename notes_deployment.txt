@@ -1,0 +1,16 @@
+__________________________________________________________________________________________
+celery
+https://docs.celeryq.dev/en/stable/getting-started/first-steps-with-celery.html#first-steps
+In production you’ll want to run the worker in the background as a daemon. 
+To do this you need to use the tools provided by your platform, 
+or something like supervisord (see Daemonization for more information).
+
+
+
+keeping the result calery
+https://docs.celeryq.dev/en/stable/getting-started/first-steps-with-celery.html#keeping-results
+Or if you want to use Redis as the result backend, but still use RabbitMQ as the message broker (a popular combination):
+
+
+django celery beat
+https://django-celery-beat.readthedocs.io/en/latest/

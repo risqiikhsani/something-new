@@ -61,6 +61,15 @@ redirect_uri =
 grant_type = authorization_code
 
 
+here we use authorization code grant instead of implicit grant 
+
+workflow oauth google :
+first user login with [google button] to get code authorization,
+code authorization is then sent to login/google python backend
+code authorization is then used to get the user access token from google , 
+access token provided by google is then used to get user detail from google ( which we will get their email address )
+
+
 
 __________________________________________________________________________________________
 error when running celery_worker image
@@ -68,3 +77,4 @@ https://github.com/Yelp/elastalert/issues/1927
 https://stackoverflow.com/questions/59661022/django-versatileimagefield-issues-no-matching-distribution-found-for-python-ma
 solved by adding this to Dockerfile
 RUN apt-get update && apt-get install -y libmagic-dev
+

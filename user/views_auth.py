@@ -13,6 +13,7 @@ from rest_framework import (decorators, generics, mixins, permissions,
                             response, serializers, status)
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from versatileimagefield.serializers import VersatileImageFieldSerializer
 
@@ -199,7 +200,7 @@ class ChangePassword(generics.GenericAPIView):
 
 
 
-class SendEmailVerification(generics.GenericAPIView):
+class SendEmailVerification(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def get_queryset(self):
@@ -213,15 +214,15 @@ class SendEmailVerification(generics.GenericAPIView):
 		return Response({"message":"verification sent"}, status=status.HTTP_201_CREATED)
 
 
-class EmailVerification(generics.GenericAPIView):
-	permission_classes = [permissions.AllowAny]
+class EmailVerification(APIView):
+    permission_classes = [permissions.AllowAny]
 
-	def get(self, request, *args, **kwargs):
-		uuid = self.kwargs["uuid"]
-		verification = get_object_or_404(Verification, uuid=uuid)
-		if verification.user.email_verified == False:
-			user = verification.user
-			user.email_verified = True
-			user.save()
+    def get(self, request, *args, **kwargs):
+        uuid = self.kwargs["uuid"]
+        verification = get_object_or_404(Verification, uuid=uuid)
+        if verification.user.email_verified == False:
+            user = verification.user
+            user.email_verified = True
+            user.save()
 
-		return Response({"message":"email has been verified successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Email has been verified successfully"}, status=status.HTTP_201_CREATED)

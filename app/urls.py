@@ -19,6 +19,7 @@ from .views import (
     SaveHandler,
 )
 
+
 urlpatterns = [
 
     path('posts',PostList.as_view(), name='post-list'),

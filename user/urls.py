@@ -5,8 +5,8 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
 
 from .staff_rest.urls import restricted_urlpatterns
 from .views import (ConnectionViewSet, RequestViewSet, UserDetail, UserList,
-                    UserViewSet, api_root, my_profile, my_user,
-                    user_relationship)
+                    UserViewSet, api_root, MyProfile, MyUser,
+                    UserRelationship)
 from .views_auth import (ChangePassword, EmailVerification, ForgotPassword,
                          ForgotPasswordCheckOptional, ForgotPasswordConfirm,
                          Login, Register, SendEmailVerification)
@@ -28,50 +28,36 @@ urlpatterns = restricted_urlpatterns + [
     path('login/google',GoogleLoginApi.as_view(), name='login-google'),
     path('token-refresh', TokenRefreshView.as_view(), name='refresh-token'),
 
-
     path('forgot-password', ForgotPassword.as_view(), name='forgot-password'),
     path('forgot-password-check-optional',ForgotPasswordCheckOptional.as_view(), name='forgot-password-check-optional'),
     path('forgot-password-confirm',ForgotPasswordConfirm.as_view(), name='forgot-password-confirm'),
 
     path('change-password', ChangePassword.as_view(), name='change-password'),
 
-
-
-
-
     path('send-email-verification',SendEmailVerification.as_view(),name="send-email-verification"),
     path('email-verification/<str:uuid>',EmailVerification.as_view(),name="email-verification"),
-
-
-    # path('dj-rest-auth/', include('dj_rest_auth.urls')),
-    # path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    # path('dj-rest-auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
-    # path('dj-rest-auth/github/', GithubLogin.as_view(), name='github_login'),
-    # path('dj-rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
 
     path('', api_root),
     path('user-list',UserList.as_view(), name='user-list'),
     path('user-detail/<int:pk>',UserDetail.as_view(), name="user-detail"),
 
-    path('my/user',my_user.as_view(), name='my-user'),
-    path('my/profile',my_profile.as_view(), name='my-profile'),
+    path('my/user',MyUser.as_view(), name='my-user'),
+    path('my/profile',MyProfile.as_view(), name='my-profile'),
 
     # WORKS
     path('connections',ConnectionViewSet.as_view({'get':'list'}), name='connection-list'),
     # WORKS
     path('user/<int:pk>/connections',UserViewSet.as_view({'get':'user_connection_list'}), name='user-connection-list'),
     # WORKS (get,put)
-    path('user/<int:pk>/relationship',user_relationship.as_view(), name='user-relationship'),
+    path('user/<int:pk>/relationship',UserRelationship.as_view(), name='user-relationship'),
     # WORKS
     #path('connections/<int:pk>/remove',ConnectionViewSet.as_view({'get':'remove_connection'}), name='connection-detail-remove'),
-
     path('user/<int:pk>/remove_connection',UserViewSet.as_view({'get':'remove_connection'}), name='connection-remove'),
-
 
     # WORKS
     path('requests',RequestViewSet.as_view({'get':'list'}), name='request-list'),
     # WORKS
-    path('waiting-requests',RequestViewSet.as_view({'get':'waiting_requests'}), name='waiting-request-list'),
+    path('my/waiting-requests',RequestViewSet.as_view({'get':'waiting_requests'}), name='waiting-request-list'),
     # WORKS
     path('user/<int:pk>/send_request',UserViewSet.as_view({'get':'send_request'}),name='send-request'),
     # WORKS
