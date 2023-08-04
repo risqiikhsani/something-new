@@ -50,6 +50,7 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = [
+    '192.168.1.9', # for home pc
     'somethingnew-testing.herokuapp.com',
     '127.0.0.1',
     'localhost', #set for websocket from reactjs ?

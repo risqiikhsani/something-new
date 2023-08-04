@@ -1,0 +1,42 @@
+In a production-ready API for a big company, the URL structure should be designed to be clean, intuitive, and consistent. The goal is to make it easy for developers, maintainers, and consumers of the API to understand and use the endpoints effectively. Here's how the URL structure might look like for common CRUD operations in a RESTful API:
+
+    List (Read all) operation:
+        URL: /api/resource (plural form for resource names)
+        HTTP Method: GET
+        Example: /api/users
+
+    Detail (Read single) operation:
+        URL: /api/resource/{id} (id represents the unique identifier of the resource)
+        HTTP Method: GET
+        Example: /api/users/123
+
+    Create operation:
+        URL: /api/resource
+        HTTP Method: POST
+        Example: /api/users
+
+    Update operation:
+        URL: /api/resource/{id} (id represents the unique identifier of the resource)
+        HTTP Method: PUT or PATCH (PUT if you replace the entire resource, PATCH if you partially update it)
+        Example: /api/users/123
+
+    Delete operation:
+        URL: /api/resource/{id} (id represents the unique identifier of the resource)
+        HTTP Method: DELETE
+        Example: /api/users/123
+
+Additional Considerations:
+
+    Use versioning: Consider adding a version number to the URL to maintain backward compatibility as the API evolves. For example, /v1/api/users or /api/v1/users.
+
+    Plural vs. Singular: Use plural resource names for the endpoint when dealing with collections (e.g., /api/users) and singular resource names when dealing with individual resources (e.g., /api/user/123).
+
+    Use nouns, not verbs: Use nouns to represent resources in the URL (e.g., /api/users), not verbs (e.g., /api/getAllUsers). The HTTP method (GET, POST, PUT, DELETE) already indicates the action.
+
+    Use lowercase: Keep the URLs lowercase for consistency and to avoid confusion between uppercase and lowercase versions of the same URL.
+
+    Use hyphen or underscore for readability: If your resource names consist of multiple words, consider using hyphens or underscores for better readability (e.g., /api/user-profiles or /api/user_profiles).
+
+    Keep it concise: Avoid overly long URLs to improve readability and maintainability.
+
+Remember that the URL structure is just one aspect of a well-designed API. Other factors, such as authentication, error handling, pagination, and response formats, also play crucial roles in creating a production-ready API for big companies.
