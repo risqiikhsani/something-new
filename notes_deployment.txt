@@ -14,3 +14,11 @@ Or if you want to use Redis as the result backend, but still use RabbitMQ as the
 
 django celery beat
 https://django-celery-beat.readthedocs.io/en/latest/
+
+
+
+how to deploy asgi 
+https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/daphne/
+python -m pip install daphne
+daphne myproject.asgi:application
+https://channels.readthedocs.io/en/latest/deploying.html
