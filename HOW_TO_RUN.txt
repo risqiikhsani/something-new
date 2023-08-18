@@ -1,0 +1,8 @@
+docker compose up -d --build
+
+docker exec -t -i django_app_container bash
+
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py createsuperuser

@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.9-slim-buster
+FROM python:3.11.4-slim-bullseye
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the project files to the working directory
 COPY . .
+
 
 # Expose a port (if needed)
 EXPOSE 8000

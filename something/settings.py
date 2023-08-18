@@ -65,8 +65,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
-    'channels', ## this will use ASGI version 3
-    # 'daphne', ## this will use ASGI version 4
+    # 'channels', ## this will use ASGI version 3
+    'daphne', ## this will use ASGI version 4
     # in order to use 'daphne' intead of 'channels' , reinstall the latest pip channels_redis version
     # but there's gonna be some error https://stackoverflow.com/questions/74048946/django-channels-event-loop-is-closing-when-using-thread
     'drf_spectacular',
