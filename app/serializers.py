@@ -27,12 +27,12 @@ class PostMedia_Serializer(serializers.ModelSerializer):
 
 
 class Post_Serializer(serializers.ModelSerializer):
-    user = User_Serializer(required=False)
-    likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
-    comments_amount = serializers.IntegerField(source="get_comments_amount",required=False)
-    shares_amount = serializers.IntegerField(source="get_shares_amount",required=False)
-    natural_time = serializers.CharField(source="get_natural_time",required=False)
-    natural_day = serializers.CharField(source="get_natural_day",required=False)
+    user = User_Serializer(read_only=True)
+    likes_amount = serializers.IntegerField(source="get_likes_amount",read_only=True)
+    comments_amount = serializers.IntegerField(source="get_comments_amount",read_only=True)
+    shares_amount = serializers.IntegerField(source="get_shares_amount",read_only=True)
+    natural_time = serializers.CharField(source="get_natural_time",read_only=True)
+    natural_day = serializers.CharField(source="get_natural_day",read_only=True)
     liked = serializers.SerializerMethodField()
     shared = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
@@ -46,7 +46,7 @@ class Post_Serializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'user', 'text', 'time_creation','natural_time','natural_day',
             'likes_amount', 'comments_amount','shares_amount','liked','shared','saved','postmedia_set','delete_images_id']
-        read_only_fields = ['user','postmedia_set']
+        # read_only_fields = ['user','postmedia_set']
         # extra_kwargs = [
         #     'deleted_images_id':{'write_only':True},
         # ]
@@ -123,11 +123,11 @@ class Post_Serializer(serializers.ModelSerializer):
 
 
 class Comment_Serializer(serializers.ModelSerializer):
-    user = User_Serializer(required=False)
-    likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
-    replies_amount = serializers.IntegerField(source="get_replies_amount",required=False)
-    natural_time = serializers.CharField(source="get_natural_time",required=False)
-    natural_day = serializers.CharField(source="get_natural_day",required=False)
+    user = User_Serializer(read_only=True)
+    likes_amount = serializers.IntegerField(source="get_likes_amount",read_only=True)
+    replies_amount = serializers.IntegerField(source="get_replies_amount",read_only=True)
+    natural_time = serializers.CharField(source="get_natural_time",read_only=True)
+    natural_day = serializers.CharField(source="get_natural_day",read_only=True)
     liked = serializers.SerializerMethodField()
     class Meta:
         model = Comment
@@ -145,10 +145,10 @@ class Comment_Serializer(serializers.ModelSerializer):
 
 
 class Reply_Serializer(serializers.ModelSerializer):
-    user = User_Serializer(required=False)
-    likes_amount = serializers.IntegerField(source="get_likes_amount",required=False)
-    natural_time = serializers.CharField(source="get_natural_time",required=False)
-    natural_day = serializers.CharField(source="get_natural_day",required=False)
+    user = User_Serializer(read_only=True)
+    likes_amount = serializers.IntegerField(source="get_likes_amount",read_only=True)
+    natural_time = serializers.CharField(source="get_natural_time",read_only=True)
+    natural_day = serializers.CharField(source="get_natural_day",read_only=True)
     liked = serializers.SerializerMethodField()
     class Meta:
         model = Reply
@@ -165,14 +165,21 @@ class Reply_Serializer(serializers.ModelSerializer):
 
 
 class Like_Serializer(serializers.ModelSerializer):
-    user = User_Serializer(required=False)
-
     class Meta:
         model = Like
-        fields = ['user']
-        read_only_fields = ['user']
+        fields = '__all__'
+
+class Save_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Save
+        fields = '__all__'
 
 class Report_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Report
+        fields = '__all__'
+
+class Share_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Share
         fields = '__all__'

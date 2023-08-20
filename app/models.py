@@ -57,6 +57,7 @@ class PostMedia(models.Model):
 class Save(models.Model):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
 	post = models.ForeignKey(Post,on_delete=models.CASCADE)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True)
 
 	def __str__(self):
 		return str(self.id)
@@ -64,10 +65,10 @@ class Save(models.Model):
 class Share(models.Model):
 	user = models.ForeignKey(User,on_delete=models.CASCADE)
 	post = models.ForeignKey(Post, on_delete=models.CASCADE)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True)
 
 	def __str__(self):
 		return str(self.id)
-
 
 
 class Comment(models.Model):
@@ -115,6 +116,8 @@ class Report(models.Model):
 	to_post = models.ForeignKey(Post, on_delete=models.CASCADE,null=True,blank=True)
 	to_comment = models.ForeignKey(Comment, on_delete=models.CASCADE,null=True,blank=True)
 	to_reply = models.ForeignKey(Reply, on_delete=models.CASCADE,null=True,blank=True)
+	time_creation = models.DateTimeField(auto_now_add=True,null=True)
+
 
 	def __str__(self):
 		return str(self.id)

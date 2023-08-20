@@ -1,6 +1,7 @@
 from .serializers import Like_Serializer
 from .serializers import Reply_Serializer
 from .serializers import Comment_Serializer
+from .serializers import Save_Serializer
 from .filters import PostFilter
 from .serializers import Post_Serializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -204,31 +205,40 @@ class LikeHandler(APIView):
             queryset = self.get_queryset().like_set.filter(user=self.request.user).first()
             queryset.delete()
             if 'post_id' in self.kwargs:
-                return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+                data = Post_Serializer(instance=self.get_queryset(),context={'request':request}).data
+                return Response(data,status=status.HTTP_200_OK)
             elif 'comment_id' in self.kwargs:
-                return Response(Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+                data = Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data
+                return Response(data,status=status.HTTP_200_OK)
             elif 'reply_id' in self.kwargs:
-                return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+                data = Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data
+                return Response(data,status=status.HTTP_200_OK)
         # otherwise
         else:
             if 'post_id' in self.kwargs:
                 like = Like(user=self.request.user,
                             post=self.get_queryset())
                 like.save()
-                return Response(Post_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+                data = Post_Serializer(instance=self.get_queryset(),context={'request':request}).data
+                return Response(data,status=status.HTTP_200_OK)
             elif 'comment_id' in self.kwargs:
                 like = Like(user=self.request.user,
                             comment=self.get_queryset())
                 like.save()
-                return Response(Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+                data = Comment_Serializer(instance=self.get_queryset(),context={'request':request}).data
+                return Response(data,status=status.HTTP_200_OK)
             elif 'reply_id' in self.kwargs:
                 like = Like(user=self.request.user,
                             reply=self.get_queryset())
                 like.save()
-                return Response(Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data,status=status.HTTP_200_OK)
+                data = Reply_Serializer(instance=self.get_queryset(),context={'request':request}).data
+                return Response(data,status=status.HTTP_200_OK)
+
+
+
 
 class SaveList(mixins.ListModelMixin, generics.GenericAPIView):
-    serializer_class = Like_Serializer
+    serializer_class = Save_Serializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
