@@ -93,7 +93,7 @@ class Code_Serializer(serializers.Serializer):
     code = serializers.CharField(required=False)
 
 class GoogleLoginApi(generics.GenericAPIView):
-    permission_classes = [permissions.AllowAny, ]
+    permission_classes = ()
     serializer_class = Code_Serializer
 
     def post(self, request, *args, **kwargs):

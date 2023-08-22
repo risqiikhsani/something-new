@@ -28,7 +28,8 @@ urlpatterns_docs = [
     # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
-    path('api/schema/docs_swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # path('api/schema/docs_swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     # path('api/schema/docs_redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # path('api/schema/openapi/', get_schema_view(
     #     title="Your Project",
