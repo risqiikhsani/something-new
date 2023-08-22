@@ -29,12 +29,12 @@ urlpatterns_docs = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
     path('api/schema/docs_swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/docs_redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('api/schema/openapi/', get_schema_view(
-        title="Your Project",
-        description="API for all things …",
-        version="1.0.0"
-    ), name='openapi-schema'),
+    # path('api/schema/docs_redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # path('api/schema/openapi/', get_schema_view(
+    #     title="Your Project",
+    #     description="API for all things …",
+    #     version="1.0.0"
+    # ), name='openapi-schema'),
 ]
 
 
