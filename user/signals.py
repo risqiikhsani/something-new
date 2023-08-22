@@ -34,8 +34,9 @@ def verificationSignal(sender,instance,created,**kwargs):
                     app_name = "Testing"
                     subject = f'Verification from{app_name} App'
                     verification_url = instance.uuid
-                    message = f'Hi {instance.user.profile.name} ,visit this link to verify your email address. {verification_url}'
-                    send_email.delay(subject,message,recipient_list)
+                    user = instance.user.profile.name
+                    text = f'Visit this link to verify your email address. {verification_url}'
+                    send_email.delay(subject,user,text,recipient_list)
                     logger.info('[Email verification email] is sent to user_id={}'.format(instance.user.id))
                     
 
@@ -45,9 +46,10 @@ def ForgotPasswordSignal(sender,instance,created,**kwargs):
     if created:
         app_name = "Testing"
         subject = f'Verification from {app_name} App'
-        message = f'Hi {instance.user.profile.name} , This is your 4 digit verification code. {instance.code} . The code will expire in 10 minutes.'
         recipient_list = [instance.user.email,]
-        send_email.delay(subject,message,recipient_list)
+        user=instance.user.profile.name
+        text=f'This is your 4 digit verification code. {instance.code} . The code will expire in 10 minutes.'
+        send_email.delay(subject,user,text,recipient_list)
         logger.info('[password reset request verification email] is sent to user_id={}'.format(instance.user.id))
         
 
@@ -76,8 +78,9 @@ def userMainSignal(sender,instance,created,**kwargs):
             recipient_list = [instance.email,]
             app_name = "Testing"
             subject = f'Welcome to {app_name} App'
-            message = f'Hi {instance.profile.name} ,thank you for registering in {app_name}.'
-            send_email.delay(subject,message,recipient_list)
+            user=instance.profile.name
+            text=f'Welcome {instance.profile.name} ,thank you for registering in {app_name}.'
+            send_email.delay(subject,user,text,recipient_list)
             logger.info('[Welcome to app email] is sent to user_id={}'.format(instance.id))
             
     # if user updated their account, send a notification email
@@ -87,8 +90,9 @@ def userMainSignal(sender,instance,created,**kwargs):
             recipient_list = [instance.email,]
             app_name = "Testing"
             subject = f'{app_name} App'
-            message = f'Hi {instance.profile.name} ,You have successfully updated your account in {app_name}.'
-            send_email.delay(subject,message,recipient_list)
+            user = instance.profile.name
+            text = f'You have successfully updated your account in {app_name}.'
+            send_email.delay(subject,user,text,recipient_list)
             logger.info('[user updated notification email] is sent to user_id={}'.format(instance.id))
 
         # Password has been updated, error !

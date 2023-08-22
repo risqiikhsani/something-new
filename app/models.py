@@ -118,7 +118,6 @@ class Report(models.Model):
 	to_reply = models.ForeignKey(Reply, on_delete=models.CASCADE,null=True,blank=True)
 	time_creation = models.DateTimeField(auto_now_add=True,null=True)
 
-
 	def __str__(self):
 		return str(self.id)
 
