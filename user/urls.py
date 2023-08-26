@@ -22,21 +22,8 @@ from .views_auth2 import GoogleLoginApi
 
 
 
+
 urlpatterns = restricted_urlpatterns + [
-    path('register',Register.as_view(), name='register'),
-    path('login',Login.as_view(), name='login'),
-    path('login/google',GoogleLoginApi.as_view(), name='login-google'),
-    path('token-refresh', TokenRefreshView.as_view(), name='refresh-token'),
-
-    path('forgot-password', ForgotPassword.as_view(), name='forgot-password'),
-    path('forgot-password-check-optional',ForgotPasswordCheckOptional.as_view(), name='forgot-password-check-optional'),
-    path('forgot-password-confirm',ForgotPasswordConfirm.as_view(), name='forgot-password-confirm'),
-
-    path('change-password', ChangePassword.as_view(), name='change-password'),
-
-    path('send-email-verification',SendEmailVerification.as_view(),name="send-email-verification"),
-    path('email-verification/<str:uuid>',EmailVerification.as_view(),name="email-verification"),
-
     path('', api_root),
     path('user-list',UserList.as_view(), name='user-list'),
     path('user-detail/<int:pk>',UserDetail.as_view(), name="user-detail"),

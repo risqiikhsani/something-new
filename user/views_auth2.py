@@ -24,6 +24,7 @@ from .serializers_auth import (ChangePassword_Serializer, Login_Serializer,
 User = get_user_model()
 
 from .services import google_get_access_token, google_get_user_info
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 
 # redirect this url from google credential redirect uri
 
@@ -95,6 +96,22 @@ class Code_Serializer(serializers.Serializer):
 class GoogleLoginApi(generics.GenericAPIView):
     permission_classes = ()
     serializer_class = Code_Serializer
+    @extend_schema(
+		request=Login_Serializer,
+		responses={
+			201: inline_serializer(
+				name="Login Response",
+				fields={
+					"user": User_Simple_Serializer(),
+					"refresh_token": serializers.CharField(),
+					"access_token": serializers.CharField(),
+				},
+			),
+			400: OpenApiResponse(description="Bad request (something invalid)"),
+			404: OpenApiResponse(description="invalid credentials"),
+		},
+		description="Login user with google",
+	)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

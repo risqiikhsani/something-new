@@ -26,9 +26,9 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 urlpatterns_docs = [
     # YOUR PATTERNS
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api.schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api.docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     # path('api/schema/docs_swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     # path('api/schema/docs_redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # path('api/schema/openapi/', get_schema_view(
@@ -41,10 +41,11 @@ urlpatterns_docs = [
 
 urlpatterns_api = [
     path('admin/', admin.site.urls),
-    path('api/',include('user.urls')),
-    path('api/app/',include('app.urls')),
-    path('api/realtime/',include('realtime.urls')),
-    path('api/marketplace/',include('marketplace.urls')),
+    path('api.auth/',include('user.urls_auth')),
+    path('api.user/',include('user.urls')),
+    path('api.app/',include('app.urls')),
+    path('api.realtime/',include('realtime.urls')),
+    path('api.marketplace/',include('marketplace.urls')),
 ]
 
 urlpatterns = urlpatterns_docs + urlpatterns_api
