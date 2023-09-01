@@ -89,6 +89,7 @@ class Login(generics.GenericAPIView):
 		},
 		description="Login user",
 	)
+	
 	def post(self, request, *args, **kwargs):
 		serializer = self.get_serializer(data=request.data)
 		if serializer.is_valid(raise_exception=True):
